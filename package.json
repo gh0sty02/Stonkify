@@ -9,7 +9,7 @@
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "data-import": "ts-node backend/seeder",
     "data-destroy": "ts-node ./backend/seeder -d",
-    "start": "node ./backend/build/server.js",
+    "start": "node ./backend/dist/server.js",
     "build": "tsc",
     "postinstall": "npm run build"
   },
