@@ -36,7 +36,7 @@ app.use("/api/upload", upload_router_1.default);
 app.use(error_middleware_1.notFound);
 app.use(error_middleware_1.errorHandler);
 (0, db_1.connectDB)().then(() => {
-    app.listen(process.env.PORT || 5000, () => {
+    app.listen(Number(process.env.PORT) || 5000, () => {
         console.log(`Server running successfully`.yellow.bold);
     });
 });

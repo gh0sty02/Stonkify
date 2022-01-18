@@ -54,7 +54,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 connectDB().then(() => {
-  app.listen(process.env.PORT || 5000, () => {
+  app.listen(Number(process.env.PORT) || 5000, () => {
     console.log(`Server running successfully`.yellow.bold);
   });
 });
