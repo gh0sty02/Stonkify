@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": true,
+    "outDir": "./backend/dist/",
+    "removeComments": true,
+    /* Strict Type-Checking Options */
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "baseUrl": "./backend/",
+    "rootDir": "./backend/",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "useUnknownInCatchVariables": false
+  },
+  "include": ["./backend/**/*"]
+}
