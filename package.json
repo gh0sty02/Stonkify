@@ -4,29 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node backend/dist/server.js",
     "dev-server": "ts-node-dev --respawn --transpile-only ./backend/server.ts",
     "dev-client": "npm run dev --prefix frontend",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "data-import": "ts-node backend/seeder",
     "data-destroy": "ts-node ./backend/seeder -d",
-    "tsc": "tsc",
-    "prepare": "npm run tsc"
+    "start": "node backend/build/index.js",
+    "build": "tsc",
+    "postinstall": "npm run build"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/bcrypt": "^5.0.0",
-    "@types/colors": "^1.2.1",
-    "@types/express": "^4.17.13",
-    "@types/jsonwebtoken": "^8.5.6",
-    "@types/mongoose": "^5.11.97",
-    "@types/morgan": "^1.9.3",
-    "@types/multer": "^1.4.7",
-    "@types/node": "^17.0.4",
     "bcryptjs": "^2.4.3",
-    "colors": "^1.4.0",
-    "concurrently": "^6.5.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
@@ -38,8 +28,21 @@
     "ts-node": "^10.4.0"
   },
   "devDependencies": {
+    "colors": "^1.4.0",
+    "concurrently": "^6.5.1",
     "@types/bcryptjs": "^2.4.2",
+    "@types/bcrypt": "^5.0.0",
+    "@types/colors": "^1.2.1",
+    "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.6",
+    "@types/mongoose": "^5.11.97",
+    "@types/morgan": "^1.9.3",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^17.0.4",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.4"
+  },
+  "engines": {
+    "node": ">=0.12"
   }
 }
