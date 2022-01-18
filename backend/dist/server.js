@@ -28,13 +28,18 @@ app.use((req, res, next) => {
     next();
 });
 app.use((0, cors_1.default)());
-app.use("/images/", express_1.default.static(path_1.default.join(__dirname, "images")));
 app.use("/api/products", product_router_1.default);
 app.use("/api/users", user_router_1.default);
 app.use("/api/orders", order_router_1.default);
 app.use("/api/upload", upload_router_1.default);
+app.use("/images/", express_1.default.static(path_1.default.join(__dirname, "images")));
+if (process.env.NODE_ENV === "production") {
+    app.use(express_1.default.static(path_1.default.join(__dirname, "../frontend/build")));
+    app.get("*", (req, res) => res.sendFile(path_1.default.resolve(__dirname, "frontend", "build", "index.html")));
+}
 app.use(error_middleware_1.notFound);
 app.use(error_middleware_1.errorHandler);
+console.log(process.env.PORT);
 (0, db_1.connectDB)().then(() => {
     app.listen(Number(process.env.PORT) || 5000, () => {
         console.log(`Server running successfully`.yellow.bold);
