@@ -42,12 +42,20 @@ app.use((req, res, next) => {
 
 app.use(cors());
 
-app.use("/images/", express.static(path.join(__dirname, "images")));
-
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/upload", uploadRouter);
+
+app.use("/images/", express.static(path.join(__dirname, "images")));
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+  app.get("*", (req: Request, res: Response) =>
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"))
+  );
+}
 
 app.use(notFound);
 
