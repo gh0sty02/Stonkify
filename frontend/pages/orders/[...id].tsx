@@ -34,6 +34,7 @@ const Order = () => {
   useEffect(() => {
     if (id && user && user.token) {
       dispatch(getOrderDetails({ id, token: user.token }));
+
       dispatch(cartReset());
     }
   }, [id!, user?.token, updateOrderStatus]);
@@ -47,6 +48,9 @@ const Order = () => {
           token: user.token,
         })
       );
+
+      localStorage.removeItem("order");
+      dispatch(resetOrders());
     }
 
     if (updateOrderStatus) {

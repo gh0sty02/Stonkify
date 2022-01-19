@@ -14,6 +14,8 @@ import { AppState } from "store";
 import { initData } from "utils/initData";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import Loader from "src/components/Loader";
+import { resetOrders } from "reducers/orderSlice";
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -23,6 +25,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     dispatch(getAllProducts({ keyword, pageNumber }));
     dispatch(getTopRatedProducts());
+    dispatch(resetOrders());
   }, []);
 
   const { user, cartItems, shippingAddress } = initData();
@@ -59,6 +62,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="py-3">
         <Container>
+          {loading && <Loader />}
           {loading && !products && !error && <p>Loading...</p>}
 
           {products && !loading && (

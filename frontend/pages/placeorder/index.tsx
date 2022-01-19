@@ -25,7 +25,7 @@ const PlaceOrder = () => {
     if (success && order) {
       router.push(`/orders/${order?._id}`);
     }
-  }, [success]);
+  }, [success, order]);
 
   useEffect(() => {
     if (user) {
@@ -46,7 +46,7 @@ const PlaceOrder = () => {
     if (paymentMethod) {
       dispatch(paymentMethodInit(paymentMethod));
     }
-  }, [user, cartItems, shippingAddressInit, paymentMethod]);
+  }, [order]);
 
   return (
     <Fragment>
