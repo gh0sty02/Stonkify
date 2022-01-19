@@ -26,6 +26,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     res.json({ session });
+  } else {
+    res.send("hello");
   }
 };
 export default handler;
