@@ -202,6 +202,7 @@ const OrderScreen = () => {
                       {!order.isPaid && (
                         <ListGroup.Item>
                           <Button
+                            target="_blank"
                             style={{ width: "100%" }}
                             onClick={() => {
                               successPaymentHandler();
