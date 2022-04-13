@@ -17,7 +17,6 @@ import { setDeleteSuccessFalse } from "reducers/deleteProductSlice";
 const ProductList: FC<{ page: number }> = ({ page }) => {
   const dispatch = useDispatch();
 
-  console.log(page);
   const { success: deleteSuccess, loading: deleteLoading } = useSelector(
     (state: AppState) => state.deleteProduct
   );

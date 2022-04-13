@@ -4,11 +4,12 @@ import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 
 import { logout } from "reducers/userInfoSlice";
+import { useLoginMutation } from "services/userApi";
 import { AppState } from "store";
 import SearchBox from "./SearchBox";
 
 const Header = () => {
-  const { user } = useSelector((state: AppState) => state.user);
+  const [_, { data: user }] = useLoginMutation({ fixedCacheKey: "login" });
   const dispatch = useDispatch();
   const router = useRouter();
 

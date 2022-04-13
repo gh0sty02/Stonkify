@@ -10,13 +10,17 @@ import { AppState } from "store";
 import Message from "components/Message";
 import Loader from "components/Loader";
 import Head from "next/head";
+import { useLoginMutation, userApi } from "services/userApi";
 
 const Login = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const dispatch = useDispatch();
-  const { user, error, loading } = useSelector((state: AppState) => state.user);
+  // const { user, error, loading } = useSelector((state: AppState) => state.user);
+  const [loginAction, { data: user, error, isLoading }] = useLoginMutation({
+    fixedCacheKey: "login",
+  });
 
   const redirect = (
     router.query["redirect"] ? router.query["redirect"] : "/"
@@ -31,7 +35,7 @@ const Login = () => {
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
     if (email && password) {
-      dispatch(login({ email, password }));
+      loginAction({ email, password });
     }
   };
 
@@ -43,7 +47,7 @@ const Login = () => {
       <FormContainer>
         <h1>Signin</h1>
         {error && <Message varient="danger">{error}</Message>}
-        {loading && <Loader />}
+        {isLoading && <Loader />}
         <Form onSubmit={submitHandler}>
           <Form.Group controlId="email">
             <Form.Label>Email Address</Form.Label>

@@ -16,14 +16,18 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Loader from "src/components/Loader";
 import { resetOrders } from "reducers/orderSlice";
+import { useGetAllProductsQuery } from "services/productsApi";
 
 const Home: NextPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const pageNumber = Number(router.query.pageNumber) || 1;
   const keyword = (router.query.keyword as string) || "";
+  const { isLoading, isError, data } = useGetAllProductsQuery({
+    pageNumber,
+    keyword,
+  });
   useEffect(() => {
-    dispatch(getAllProducts({ keyword, pageNumber }));
     dispatch(getTopRatedProducts());
     dispatch(resetOrders());
   }, []);
@@ -43,9 +47,9 @@ const Home: NextPage = () => {
     }
   }, [user, cartItems, shippingAddressInit]);
 
-  const { products, loading, error } = useSelector(
-    (state: AppState) => state.productList
-  );
+  // const { products, loading, error } = useSelector(
+  //   (state: AppState) => state.productList
+  // );
 
   return (
     <>
@@ -62,11 +66,11 @@ const Home: NextPage = () => {
       </Head>
       <main className="py-3">
         <Container>
-          {loading && <Loader />}
-          {loading && !products && !error && <p>Loading...</p>}
+          {isLoading && <Loader />}
+          {isLoading && !isError && <p>Loading...</p>}
 
-          {products && !loading && (
-            <HomeScreen products={products} keyword={keyword} />
+          {data?.products && !isLoading && (
+            <HomeScreen products={data.products} keyword={keyword} />
           )}
         </Container>
       </main>
