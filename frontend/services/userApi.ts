@@ -1,15 +1,22 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+  BaseQueryFn,
+  createApi,
+  FetchArgs,
+  fetchBaseQuery,
+} from "@reduxjs/toolkit/query/react";
 import { ILoginFormData, IUserData } from "interfaces/formdata.interface";
 import IUser from "interfaces/user.interface";
+import { authSlice } from "reducers/authSlice";
 
 import { AppState } from "store";
 
 export const userApi = createApi({
-  reducerPath: "userApi",
+  reducerPath: "user",
   tagTypes: ["user"],
   keepUnusedDataFor: 60,
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.BACKEND_URL}/api/users`,
+
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as AppState).auth.token;
       if (token) {
@@ -31,6 +38,26 @@ export const userApi = createApi({
           "Content-Type": "application/json",
         },
       }),
+
+      async onCacheEntryAdded(
+        arg,
+        {
+          dispatch,
+          getState,
+          extra,
+          requestId,
+          cacheEntryRemoved,
+          cacheDataLoaded,
+          getCacheEntry,
+        }
+      ) {
+        dispatch(
+          authSlice.actions.setCredentials({
+            token: (await cacheDataLoaded).data.token as string,
+            user: (await cacheDataLoaded).data as IUser,
+          })
+        );
+      },
     }),
     register: builder.mutation<Partial<IUser>, IUserData>({
       query: ({ email, password, name }) => ({

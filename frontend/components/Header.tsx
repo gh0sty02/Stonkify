@@ -9,12 +9,14 @@ import { AppState } from "store";
 import SearchBox from "./SearchBox";
 
 const Header = () => {
-  const [_, { data: user }] = useLoginMutation({ fixedCacheKey: "login" });
+  const [login, { data: user, reset }] = useLoginMutation({
+    fixedCacheKey: "login",
+  });
   const dispatch = useDispatch();
   const router = useRouter();
 
   const logoutHandler = () => {
-    dispatch(logout());
+    reset();
     router.push("/login");
   };
 

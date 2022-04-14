@@ -7,13 +7,15 @@ import { getMyOrders } from "reducers/asyncActions/orderActions";
 import { cartInit, shippingAddressInit } from "reducers/cartSlice";
 import { userInit } from "reducers/userInfoSlice";
 import ProfileScreen from "screens/ProfileScreen";
+import { useLoginMutation } from "services/userApi";
 import { initData } from "utils/initData";
 
 const Profile = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [_, { data: user }] = useLoginMutation();
 
-  const { user, cartItems, shippingAddress } = initData();
+  const { cartItems, shippingAddress } = initData();
 
   useEffect(() => {
     if (user) {

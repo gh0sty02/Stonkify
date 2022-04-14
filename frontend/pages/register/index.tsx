@@ -9,6 +9,7 @@ import { register } from "reducers/asyncActions/userActions";
 import { AppState } from "store";
 import Message from "components/Message";
 import Loader from "components/Loader";
+import { useRegisterMutation } from "services/userApi";
 
 const Register = () => {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -19,6 +20,7 @@ const Register = () => {
   const dispatch = useDispatch();
   const [message, setMessage] = useState<string | undefined>(undefined);
   const { user, error, loading } = useSelector((state: AppState) => state.user);
+  const [register, { isLoading, isError }] = useRegisterMutation();
 
   const redirect = (
     router.query["redirect"] ? router.query["redirect"] : "/"
@@ -40,7 +42,7 @@ const Register = () => {
       setMessage("Passwords Don't Match");
     } else {
       if (email && password && name) {
-        dispatch(register({ name, email, password }));
+        register({ email, password, name });
       }
     }
   };

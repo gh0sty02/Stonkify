@@ -3,24 +3,21 @@ import { FormEvent, Fragment, useEffect, useRef } from "react";
 import { Button, Form, Row, Col } from "react-bootstrap";
 import FormContainer from "components/FormContainer";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
-
-import { login } from "reducers/asyncActions/userActions";
-import { AppState } from "store";
 import Message from "components/Message";
 import Loader from "components/Loader";
 import Head from "next/head";
 import { useLoginMutation, userApi } from "services/userApi";
+import RequestError from "interfaces/requestError.interface";
 
 const Login = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const dispatch = useDispatch();
-  // const { user, error, loading } = useSelector((state: AppState) => state.user);
-  const [loginAction, { data: user, error, isLoading }] = useLoginMutation({
-    fixedCacheKey: "login",
-  });
+
+  const [loginAction, { data: user, error, isLoading, isError }] =
+    useLoginMutation({
+      fixedCacheKey: "login",
+    });
 
   const redirect = (
     router.query["redirect"] ? router.query["redirect"] : "/"
@@ -46,7 +43,11 @@ const Login = () => {
       </Head>
       <FormContainer>
         <h1>Signin</h1>
-        {error && <Message varient="danger">{error}</Message>}
+        {error && (
+          <Message varient="danger">
+            {(error as RequestError).data.message}
+          </Message>
+        )}
         {isLoading && <Loader />}
         <Form onSubmit={submitHandler}>
           <Form.Group controlId="email">

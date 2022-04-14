@@ -7,7 +7,7 @@ import { HYDRATE } from "next-redux-wrapper";
 import { AppState } from "store";
 
 export const productsApi = createApi({
-  reducerPath: "productsApi",
+  reducerPath: "products",
   tagTypes: ["product"],
   extractRehydrationInfo(action, { reducerPath }) {
     if (action.type === HYDRATE) {
