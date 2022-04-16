@@ -20,7 +20,7 @@ export const userApi = createApi({
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as AppState).auth.token;
       if (token) {
-        headers.set("authentication", `Bearer ${token}`);
+        headers.set("authorization", `Bearer ${token}`);
       }
 
       return headers;
@@ -61,7 +61,7 @@ export const userApi = createApi({
     }),
     register: builder.mutation<Partial<IUser>, IUserData>({
       query: ({ email, password, name }) => ({
-        url: "register",
+        url: "/",
         method: "POST",
         body: { name, email, password },
         headers: {
@@ -96,6 +96,7 @@ export const userApi = createApi({
           Authorization: `Bearer ${body.token}`,
         },
       }),
+      invalidatesTags: ["user"],
     }),
     updateUser: builder.mutation<IUser, { id: string; body: IUserData }>({
       query: ({ id, body }) => ({
@@ -106,6 +107,7 @@ export const userApi = createApi({
           "Content-Type": "application/json",
         },
       }),
+      invalidatesTags: ["user"],
     }),
     deleteUser: builder.mutation<string, { id: string; token: string }>({
       query: ({ id, token }) => ({
@@ -113,6 +115,17 @@ export const userApi = createApi({
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
+
+    tokenLogin: builder.mutation<Partial<IUser>, { token: string }>({
+      query: ({ token }) => ({
+        url: "tokenLogin",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
         },
       }),
     }),
@@ -128,4 +141,5 @@ export const {
   useGetCurrentUserQuery,
   useUpdateUserMutation,
   useUpdateUserProfileMutation,
+  useTokenLoginMutation,
 } = userApi;

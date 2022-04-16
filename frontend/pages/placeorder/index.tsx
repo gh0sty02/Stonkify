@@ -18,7 +18,8 @@ const PlaceOrder = () => {
   const dispatch = useDispatch();
 
   const router = useRouter();
-  const { user, cartItems, shippingAddress, paymentMethod } = initData();
+  const { user } = useSelector((state: AppState) => state.auth);
+  const { cartItems, shippingAddress, paymentMethod } = initData();
   const { success, order } = useSelector((state: AppState) => state.order);
 
   useEffect(() => {

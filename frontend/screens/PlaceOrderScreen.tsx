@@ -15,8 +15,10 @@ import { FormEvent } from "react";
 import CheckoutSteps from "components/CheckoutSteps";
 import Message from "components/Message";
 import { AppState } from "store";
-import { createOrder } from "reducers/asyncActions/orderActions";
 import { IShippingAddress } from "interfaces/orderUtils.interface";
+import { useCreateOrderMutation } from "services/orderApi";
+import RequestError from "interfaces/requestError.interface";
+import { setOrder } from "reducers/orderSlice";
 
 const PlaceOrderScreen = () => {
   const dispatch = useDispatch();
@@ -25,7 +27,9 @@ const PlaceOrderScreen = () => {
     (state: AppState) => state.cart
   );
 
-  const { user } = useSelector((state: AppState) => state.user);
+  const [createOrder, { isLoading, isError, error }] = useCreateOrderMutation();
+
+  const { user } = useSelector((state: AppState) => state.auth);
 
   // calculate price
   const addDecimals = (n: number) =>
@@ -46,30 +50,39 @@ const PlaceOrderScreen = () => {
     (Number(itemsPrice) + Number(shippingPrice) + Number(taxPrice)).toFixed(2)
   );
 
-  const { order, success, error, loading } = useSelector(
+  const { order, success, loading } = useSelector(
     (state: AppState) => state.order
   );
 
   const cartProducts = cartItems.map((item) => {
-    return { ...item, product: item._id as string };
+    return {
+      productId: item._id as string,
+      qty: item.qty as number,
+      price: item.price as number,
+      name: item.name as string,
+      image: item.image as string,
+    };
   });
 
-  const placeOrderHandler = (e: FormEvent) => {
+  const placeOrderHandler = async (e: FormEvent) => {
     e.preventDefault();
     if (paymentMethod && user && user.token) {
-      dispatch(
-        createOrder({
-          //@ts-ignore
-          orderItems: cartProducts,
-          shippingAddress: shippingAddress as IShippingAddress,
-          paymentMethod: paymentMethod,
-          itemsPrice,
-          shippingPrice,
-          taxPrice,
-          totalPrice,
-          token: user.token,
-        })
-      );
+      const order = await createOrder({
+        orderItems: cartProducts,
+        shippingAddress: shippingAddress as IShippingAddress,
+        paymentMethod: paymentMethod,
+        itemsPrice,
+        shippingPrice,
+        taxPrice,
+        totalPrice,
+        token: user.token,
+        isPaid: false,
+      });
+
+      if ("data" in order) {
+        dispatch(setOrder(order.data));
+        router.push(`/orders/${order.data._id}`);
+      }
     }
   };
 
@@ -157,7 +170,11 @@ const PlaceOrderScreen = () => {
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
-                {error && <Message varient="error">{error}</Message>}
+                {error && (
+                  <Message varient="error">
+                    {(error as RequestError).data.message}
+                  </Message>
+                )}
               </ListGroup.Item>
               <ListGroup.Item>
                 <Button

@@ -41,6 +41,8 @@ export const addOrderItems = async (
 
       const createdOrder = await order.save();
 
+      console.log(createdOrder);
+
       res.status(201).json(createdOrder);
     }
   } catch (err) {

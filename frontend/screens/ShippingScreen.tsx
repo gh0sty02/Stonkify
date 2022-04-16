@@ -15,7 +15,7 @@ const ShippingScreen: FC<{
   shippingAddress: IShippingAddress | undefined;
   cartItems: IProduct[] | undefined;
 }> = ({ shippingAddress, cartItems }) => {
-  const { user } = useSelector((state: AppState) => state.user);
+  const { user } = useSelector((state: AppState) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
 

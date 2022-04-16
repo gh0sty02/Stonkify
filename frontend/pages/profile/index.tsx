@@ -1,51 +1,44 @@
+import { IOrder } from "interfaces/orderUtils.interface";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Fragment, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { Dispatch, Fragment, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserOrders } from "reducers/orderSlice";
 
-import { getMyOrders } from "reducers/asyncActions/orderActions";
-import { cartInit, shippingAddressInit } from "reducers/cartSlice";
-import { userInit } from "reducers/userInfoSlice";
 import ProfileScreen from "screens/ProfileScreen";
-import { useLoginMutation } from "services/userApi";
-import { initData } from "utils/initData";
+import { useGetMyOrdersMutation } from "services/orderApi";
+
+import { AppState } from "store";
 
 const Profile = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [_, { data: user }] = useLoginMutation();
+  const { user, token } = useSelector((state: AppState) => state.auth);
+  const [getMyOrders, { isLoading: ordersLoading, error: ordersError }] =
+    useGetMyOrdersMutation();
 
-  const { cartItems, shippingAddress } = initData();
+  const useInitUserOrders = async (token: string) => {
+    const orders = await getMyOrders({ token });
+
+    if ("data" in orders) {
+      dispatch(setUserOrders(orders.data as IOrder[]));
+    }
+  };
 
   useEffect(() => {
-    if (user) {
-      dispatch(userInit(user));
-    }
+    if (token) {
+      console.log("user yes");
 
-    if (cartItems) {
-      dispatch(cartInit(cartItems));
+      useInitUserOrders(token);
     }
-    if (shippingAddress) {
-      dispatch(shippingAddressInit(shippingAddress));
-    }
-
-    if (user && user.token) {
-      dispatch(getMyOrders(user.token));
-    }
-
-    if (!user) {
-      router.push("/login");
-    }
-  }, []);
+  }, [token]);
 
   return (
     <Fragment>
       <Head>
         <title>Stonkify | {`${user?.name}'s Profile`}</title>
       </Head>
-      <div>
-        <ProfileScreen />
-      </div>
+      <div>{<ProfileScreen />}</div>
     </Fragment>
   );
 };

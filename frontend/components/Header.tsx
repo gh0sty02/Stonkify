@@ -2,21 +2,17 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-
-import { logout } from "reducers/userInfoSlice";
-import { useLoginMutation } from "services/userApi";
+import { logout } from "reducers/authSlice";
 import { AppState } from "store";
 import SearchBox from "./SearchBox";
 
 const Header = () => {
-  const [login, { data: user, reset }] = useLoginMutation({
-    fixedCacheKey: "login",
-  });
+  const { user } = useSelector((state: AppState) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
 
   const logoutHandler = () => {
-    reset();
+    dispatch(logout());
     router.push("/login");
   };
 

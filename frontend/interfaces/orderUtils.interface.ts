@@ -20,21 +20,14 @@ export type cartType = {
 };
 
 export interface IOrder {
-  _id: string;
-
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-  };
+  _id?: string;
 
   orderItems: {
-    _id: string;
+    productId: string;
     name: string;
     qty: number;
-    image: string;
     price: number;
-    product: string;
+    image: string;
   }[];
 
   shippingAddress: {
@@ -54,10 +47,7 @@ export interface IOrder {
 
   totalPrice: number;
 
-  isPaid: {
-    type: boolean;
-    default: false;
-  };
+  isPaid: boolean;
 
   paidAt?: string;
 
@@ -66,4 +56,10 @@ export interface IOrder {
   deliveredAt?: string;
 
   createdAt?: string;
+}
+
+export interface ICreateProduct {}
+
+export interface IOrderDetails extends IOrder {
+  token: string;
 }

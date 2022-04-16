@@ -11,18 +11,18 @@ import ProductListScreen from "screens/ProductListScreen";
 import { AppState } from "store";
 import { initData } from "utils/initData";
 import { resetUpdateProductSucces } from "reducers/adminProductSlice";
-import { setCreateProductSuccessFalse } from "reducers/createProductSlice";
-import { setDeleteSuccessFalse } from "reducers/deleteProductSlice";
+// import { setCreateProductSuccessFalse } from "reducers/createProductSlice";
+// import { setDeleteSuccessFalse } from "reducers/deleteProductSlice";
 
 const ProductList: FC<{ page: number }> = ({ page }) => {
   const dispatch = useDispatch();
 
-  const { success: deleteSuccess, loading: deleteLoading } = useSelector(
-    (state: AppState) => state.deleteProduct
-  );
-  const { success: createProductSuccess, createdProduct } = useSelector(
-    (state: AppState) => state.createProduct
-  );
+  // const { success: deleteSuccess, loading: deleteLoading } = useSelector(
+  //   (state: AppState) => state.deleteProduct
+  // );
+  // const { success: createProductSuccess, createdProduct } = useSelector(
+  //   (state: AppState) => state.createProduct
+  // );
   const { user } = initData();
   useEffect(() => {
     if (user) {
@@ -43,20 +43,20 @@ const ProductList: FC<{ page: number }> = ({ page }) => {
     }
   }, [page]);
 
-  useEffect(() => {
-    if (deleteSuccess && !deleteLoading) {
-      dispatch(getAllProducts({ keyword: "", pageNumber: page }));
-      dispatch(setDeleteSuccessFalse());
-    }
-  }, [deleteSuccess, deleteLoading]);
+  // useEffect(() => {
+  //   if (deleteSuccess && !deleteLoading) {
+  //     dispatch(getAllProducts({ keyword: "", pageNumber: page }));
+  //     dispatch(setDeleteSuccessFalse());
+  //   }
+  // }, [deleteSuccess, deleteLoading]);
 
-  useEffect(() => {
-    if (createProductSuccess && createdProduct) {
-      router.push(`/admin/product/${createdProduct._id}/edit`);
-      dispatch(resetUpdateProductSucces());
-      dispatch(setCreateProductSuccessFalse());
-    }
-  }, [createProductSuccess, createdProduct]);
+  // useEffect(() => {
+  //   if (createProductSuccess && createdProduct) {
+  //     router.push(`/admin/product/${createdProduct._id}/edit`);
+  //     dispatch(resetUpdateProductSucces());
+  //     dispatch(setCreateProductSuccessFalse());
+  //   }
+  // }, [createProductSuccess, createdProduct]);
 
   return (
     <Fragment>

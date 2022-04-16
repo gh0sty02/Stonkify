@@ -7,15 +7,23 @@ import Paginate from "src/components/Paginate";
 import { useSelector } from "react-redux";
 import { AppState } from "store";
 import ProductsCarousel from "src/components/ProductsCarousel";
+import RequestError from "interfaces/requestError.interface";
+import {
+  getTopRatedProducts,
+  useGetTopRatedProductsQuery,
+} from "services/productsApi";
 
-const HomeScreen: FC<{ products: IProduct[]; keyword: string }> = ({
-  products,
-  keyword,
-}) => {
+const HomeScreen: FC<{
+  products: IProduct[];
+  topRatedProducts: IProduct[];
+  keyword: string;
+}> = ({ products, keyword, topRatedProducts }) => {
   const { page, pages } = useSelector((state: AppState) => state.productList);
+
   return (
     <>
-      {!keyword && <ProductsCarousel />}
+      {!keyword && <ProductsCarousel topProducts={topRatedProducts} />}
+
       <h1 className="mt-3">Latest Products</h1>
       <Row>
         {products.map((prod: IProduct) => (

@@ -10,6 +10,8 @@ import { AppState } from "store";
 import Message from "components/Message";
 import Loader from "components/Loader";
 import { useRegisterMutation } from "services/userApi";
+import { setCredentials } from "reducers/authSlice";
+import RequestError from "interfaces/requestError.interface";
 
 const Register = () => {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -19,8 +21,8 @@ const Register = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [message, setMessage] = useState<string | undefined>(undefined);
-  const { user, error, loading } = useSelector((state: AppState) => state.user);
-  const [register, { isLoading, isError }] = useRegisterMutation();
+  const [register, { isLoading, isError, error }] = useRegisterMutation();
+  const user = useSelector((state: AppState) => state.auth.user);
 
   const redirect = (
     router.query["redirect"] ? router.query["redirect"] : "/"
@@ -30,7 +32,7 @@ const Register = () => {
     router.push(`${redirect}`, undefined, { shallow: true });
   }
 
-  const submitHandler = (e: FormEvent) => {
+  const submitHandler = async (e: FormEvent) => {
     e.preventDefault();
 
     const email = emailRef.current?.value;
@@ -42,7 +44,19 @@ const Register = () => {
       setMessage("Passwords Don't Match");
     } else {
       if (email && password && name) {
-        register({ email, password, name });
+        const user = await register({ email, password, name });
+        if ("data" in user) {
+          dispatch(
+            setCredentials({
+              user: user.data,
+              token: user.data.token as string,
+            })
+          );
+
+          if ("token" in user.data) {
+            localStorage.setItem("user", user.data.token as string);
+          }
+        }
       }
     }
   };
@@ -51,8 +65,12 @@ const Register = () => {
     <FormContainer>
       <h1>Signin</h1>
       {message && <Message varient="danger">{message}</Message>}
-      {error && <Message varient="danger">{error}</Message>}
-      {loading && <Loader />}
+      {error && (
+        <Message varient="danger">
+          {(error as RequestError).data.message}
+        </Message>
+      )}
+      {isLoading && <Loader />}
       <Form onSubmit={submitHandler}>
         <Form.Group controlId="name">
           <Form.Label>Name</Form.Label>

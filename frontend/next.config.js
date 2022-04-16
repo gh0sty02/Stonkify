@@ -8,4 +8,7 @@ module.exports = {
     BASE_URL: process.env.BASE_URL,
   },
   swcMinify: false,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };

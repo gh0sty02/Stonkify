@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+import IUser from "Interfaces/user.interface";
 import User from "../models/user.model";
 import generateToken from "../utils/generateToken";
+import jwt from "jsonwebtoken";
 
 // @desc   Login for existing user
 // @route   POST /api/login
@@ -243,5 +245,33 @@ export const updateUser = async (
     }
   } catch (err) {
     next(err);
+  }
+};
+
+export const tokenLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1] as string;
+
+    if (!token) {
+      throw new Error("No token provided");
+    }
+
+    const decode: any = jwt.verify(token, process.env.JWT_SECRET as string);
+
+    const user = (await User.findById(decode.id)
+      .select("_id email name isAdmin")
+      .select("-password ")) as IUser;
+
+    if (user) {
+      return res.json(user);
+    } else {
+      throw new Error("User Not found");
+    }
+  } catch (error) {
+    next(error);
   }
 };

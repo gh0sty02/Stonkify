@@ -3,10 +3,6 @@ import {
   combineReducers,
   configureStore,
   ConfigureStoreOptions,
-  getDefaultMiddleware,
-  isRejectedWithValue,
-  Middleware,
-  MiddlewareAPI,
   ThunkAction,
 } from "@reduxjs/toolkit";
 import { createWrapper } from "next-redux-wrapper";
@@ -14,10 +10,7 @@ import { adminOrderSlice } from "reducers/adminOrderSlice";
 import { adminProductSlice } from "reducers/adminProductSlice";
 import { adminUserSlice } from "reducers/adminUserSlice";
 import { authSlice } from "reducers/authSlice";
-import { createProductSlice } from "reducers/createProductSlice";
-import { deleteProductSlice } from "reducers/deleteProductSlice";
 import productReviewSlice from "reducers/productReviewSlice";
-import { topProductsSlice } from "reducers/topProductsSlice";
 import { userApi } from "services/userApi";
 import { cartSlice } from "./reducers/cartSlice";
 import { orderSlice } from "./reducers/orderSlice";
@@ -44,23 +37,21 @@ import {
 } from "next-redux-cookie-wrapper";
 import { RootState } from "@reduxjs/toolkit/dist/query/core/apiState";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
+import { orderApi } from "services/orderApi";
 
 const reducers = combineReducers({
   productList: productsListSlice.reducer,
   productDetails: productDetailsSlice.reducer,
   cart: cartSlice.reducer,
-  // user: userSlice.reducer,
   order: orderSlice.reducer,
-  createProduct: createProductSlice.reducer,
-  topProducts: topProductsSlice.reducer,
   productReview: productReviewSlice.reducer,
-  deleteProduct: deleteProductSlice.reducer,
   adminUserSlice: adminUserSlice.reducer,
   adminProductEdit: adminProductSlice.reducer,
   adminOrderSlice: adminOrderSlice.reducer,
   [userApi.reducerPath]: userApi.reducer,
   [productsApi.reducerPath]: productsApi.reducer,
   [authSlice.name]: authSlice.reducer,
+  [orderApi.reducerPath]: orderApi.reducer,
 });
 
 const persistConfig = {
@@ -69,18 +60,23 @@ const persistConfig = {
   stateReconciler: autoMergeLevel1,
   whiteList: ["products", "user"],
 };
-const _persistedReducer = persistReducer(persistConfig, reducers);
+// const _persistedReducer = persistReducer(persistConfig, reducers);
 export const makeStore = (
   options?: ConfigureStoreOptions["preloadedState"] | undefined
 ) =>
   configureStore({
-    reducer: _persistedReducer,
+    // reducer: _persistedReducer,
+    reducer: reducers,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
-      }).concat(userApi.middleware, productsApi.middleware),
+      }).concat(
+        userApi.middleware,
+        productsApi.middleware,
+        orderApi.middleware
+      ),
     ...options,
     devTools: process.env.NODE_ENV !== "production",
   });
@@ -88,7 +84,7 @@ export const makeStore = (
 export const store = makeStore();
 
 export type AppStore = ReturnType<typeof makeStore>;
-export type AppState = ReturnType<AppStore["getState"]>;
+export type AppState = ReturnType<typeof store.getState>;
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
   AppState,

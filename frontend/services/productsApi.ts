@@ -32,13 +32,18 @@ export const productsApi = createApi({
     getProduct: builder.query<IProduct, string>({
       query: (id) => `/${id}`,
     }),
+    getTopRatedProducts: builder.query<IProduct[], void>({
+      query: () => `/top`,
+    }),
   }),
 });
 
 export const {
   useGetAllProductsQuery,
   useGetProductQuery,
+  useGetTopRatedProductsQuery,
   util: { getRunningOperationPromises },
 } = productsApi;
 
-export const { getAllProducts, getProduct } = productsApi.endpoints;
+export const { getAllProducts, getProduct, getTopRatedProducts } =
+  productsApi.endpoints;

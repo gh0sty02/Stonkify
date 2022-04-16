@@ -30,8 +30,8 @@ const OrderScreen = () => {
   const state = useSelector((state: AppState) => state);
   const dispatch = useDispatch();
   const router = useRouter();
-  const { order, error, loading } = state.order;
-  const { user } = state.user;
+  const { currentOrder: order, error, loading } = state.order;
+  const { user } = state.auth;
 
   const IdQueries = router.query.id as string[];
 
@@ -85,7 +85,7 @@ const OrderScreen = () => {
         <Message varient="danger">{error}</Message>
       ) : (
         <>
-          {order && (
+          {order && user && (
             <>
               <h1>Order {order?._id}</h1>
               <Row>
@@ -94,12 +94,12 @@ const OrderScreen = () => {
                     <ListGroup.Item>
                       <h2>Shipping</h2>
                       <p>
-                        <strong>Name :</strong> {order.user.name}
+                        <strong>Name :</strong> {user.name}
                       </p>
                       <p>
                         <strong>Email :</strong>{" "}
-                        <Link href={`mailto:${order.user.email}`} passHref>
-                          <a>{order.user.email}</a>
+                        <Link href={`mailto:${user.email}`} passHref>
+                          <a>{user.email}</a>
                         </Link>
                       </p>
                       <p>
@@ -152,7 +152,7 @@ const OrderScreen = () => {
                                   />
                                 </Col>
                                 <Col>
-                                  <Link href={`/product/${item._id}`}>
+                                  <Link href={`/product/${item.productId}`}>
                                     {item.name}
                                   </Link>
                                 </Col>

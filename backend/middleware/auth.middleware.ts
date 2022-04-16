@@ -16,9 +16,11 @@ export const protect = async (
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
+
       const decode: any = jwt.verify(token, process.env.JWT_SECRET as string);
 
       req.user = (await User.findById(decode.id).select("-password")) as IUser;
+
       // res.setHeader("X-auth-token", token);
     } else {
       res.status(401);

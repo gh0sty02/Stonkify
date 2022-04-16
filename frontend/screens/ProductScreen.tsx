@@ -22,8 +22,12 @@ import { addToCart } from "reducers/asyncActions/cartActions";
 import { createReview } from "reducers/asyncActions/reviewActions";
 import { useGetProductQuery } from "services/productsApi";
 import { IProduct } from "interfaces/products.interface";
+import RequestError from "interfaces/requestError.interface";
 
-const ProductScreen: FC<{ id: string; product: IProduct }> = ({ id }) => {
+const ProductScreen: FC<{ id: string; product: IProduct }> = ({
+  id,
+  product,
+}) => {
   const [qty, setQty] = useState<number>(1);
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>(" ");
@@ -32,16 +36,16 @@ const ProductScreen: FC<{ id: string; product: IProduct }> = ({ id }) => {
 
   const state = useSelector((state: AppState) => state);
 
-  const { isLoading, isError, data: product, error } = useGetProductQuery(id);
+  const { isLoading, isError, error } = useGetProductQuery(id);
 
   const { error: reviewError, success: reviewSuccess } = state.productReview;
 
-  const { user } = state.user;
+  const { user } = state.auth;
 
-  useEffect(() => {
-    setRating(0);
-    setComment(" ");
-  }, [reviewSuccess]);
+  // useEffect(() => {
+  //   setRating(0);
+  //   setComment(" ");
+  // }, [reviewSuccess]);
 
   const addToCartHandler = () => {
     dispatch(addToCart({ id, qty }));
@@ -76,7 +80,9 @@ const ProductScreen: FC<{ id: string; product: IProduct }> = ({ id }) => {
             {isLoading ? (
               <Loader />
             ) : isError ? (
-              <Message varient={"danger"}>{error}</Message>
+              <Message varient={"danger"}>
+                {(error as RequestError).data.message}
+              </Message>
             ) : (
               <Fragment>
                 <Row>

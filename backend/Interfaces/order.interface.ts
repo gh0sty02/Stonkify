@@ -11,7 +11,13 @@ interface IOrder {
 export interface IOrderDetails extends mongoose.Document {
   user: mongoose.Schema.Types.ObjectId;
 
-  orderItems: [IOrder];
+  orderItems: {
+    productId: string;
+    name: string;
+    qty: number;
+    price: number;
+    image: string;
+  }[];
 
   shippingAddress: {
     address: String;
@@ -38,3 +44,7 @@ export interface IOrderDetails extends mongoose.Document {
 
   deliveredAt: number;
 }
+
+// interface IOrderDetails extends IOrder {
+//   token: string;
+// }

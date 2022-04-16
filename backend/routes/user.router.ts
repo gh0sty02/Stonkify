@@ -5,6 +5,7 @@ import {
   getUserProfile,
   getUsers,
   registerUser,
+  tokenLogin,
   updateUser,
   updateUserProfile,
 } from "../controllers/user.controller";
@@ -21,6 +22,7 @@ router
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
 
+router.post("/tokenlogin", tokenLogin);
 router
   .use(protect, isAdmin)
   .route("/:id")
