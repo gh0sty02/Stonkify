@@ -1,3 +1,6 @@
+import { ICartDetails } from "./cart.interface";
+import { IOrderDetails } from "./order.interface";
+
 export default interface IUser {
   _id: string;
   name: string;
@@ -6,4 +9,6 @@ export default interface IUser {
   isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
+  orders: IOrderDetails[];
+  cartItems: ICartDetails[];
 }

@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import Order from "../models/order.model";
 import { IOrderDetails } from "../Interfaces/order.interface";
+import mongoose from "mongoose";
+import User from "../models/user.model";
 
 // @desc    Create a new Order
 // @route     POST /api/products/
@@ -26,24 +28,38 @@ export const addOrderItems = async (
       res.status(400);
       throw new Error("No order Items");
     } else {
-      const order = new Order({
-        orderItems,
-        user: req.user?._id,
-        shippingAddress,
-        paymentMethod,
-        itemsPrice,
-        taxPrice,
-        shippingPrice,
-        totalPrice,
+      const session = await mongoose.startSession({
+        defaultTransactionOptions: {
+          writeConcern: { w: "majority" },
+          readConcern: { level: "majority" },
+        },
       });
+      session.startTransaction();
+      try {
+        const order = await new Order(
+          {
+            orderItems,
+            user: req.user?._id,
+            shippingAddress,
+            paymentMethod,
+            itemsPrice,
+            taxPrice,
+            shippingPrice,
+            totalPrice,
+          },
+          session
+        );
+        const createdOrder = await order.save({ session });
+        const user = await User.findById(order.user).session(session);
+        await user?.orders.push(createdOrder._id);
+        await user?.save({ session });
+        await order.populate("user", "name email");
 
-      order.populate("user", "name email");
-
-      const createdOrder = await order.save();
-
-      console.log(createdOrder);
-
-      res.status(201).json(createdOrder);
+        await session.commitTransaction();
+        res.status(201).json(order);
+      } catch (error) {
+        throw error;
+      }
     }
   } catch (err) {
     next(err);

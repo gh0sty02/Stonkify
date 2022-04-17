@@ -8,21 +8,21 @@ import PaymentScreen from "screens/PaymentMethodScreen";
 import { initData } from "utils/initData";
 
 const PaymentMethod = () => {
-  const { user, cartItems, shippingAddress, paymentMethod } = initData();
+  // const { user, cartItems, shippingAddress, paymentMethod } = initData();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (user) {
-      dispatch(userInit(user));
-    }
+  // useEffect(() => {
+  //   if (user) {
+  //     dispatch(userInit(user));
+  //   }
 
-    if (cartItems) {
-      dispatch(cartInit(cartItems));
-    }
-    if (shippingAddress) {
-      dispatch(shippingAddressInit(shippingAddress));
-    }
-  }, [user, cartItems, shippingAddressInit]);
+  //   if (cartItems) {
+  //     dispatch(cartInit(cartItems));
+  //   }
+  //   if (shippingAddress) {
+  //     dispatch(shippingAddressInit(shippingAddress));
+  //   }
+  // }, [user, cartItems, shippingAddressInit]);
   return (
     <Fragment>
       <Head>

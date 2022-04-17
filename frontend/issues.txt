@@ -1,2 +1,0 @@
-checkout issue, button not working
-previous order gets loaded even after paid

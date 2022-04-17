@@ -19,8 +19,10 @@ const PlaceOrder = () => {
 
   const router = useRouter();
   const { user } = useSelector((state: AppState) => state.auth);
-  const { cartItems, shippingAddress, paymentMethod } = initData();
-  const { success, order } = useSelector((state: AppState) => state.order);
+  // const { cartItems, shippingAddress, paymentMethod } = initData();
+  const { success, currentOrder: order } = useSelector(
+    (state: AppState) => state.order
+  );
 
   useEffect(() => {
     if (success && order) {
@@ -28,26 +30,26 @@ const PlaceOrder = () => {
     }
   }, [success, order]);
 
-  useEffect(() => {
-    if (user) {
-      dispatch(userInit(user));
-    }
+  // useEffect(() => {
+  //   if (user) {
+  //     dispatch(userInit(user));
+  //   }
 
-    if (!user) {
-      router.push("/login");
-    }
+  //   if (!user) {
+  //     router.push("/login");
+  //   }
 
-    if (cartItems) {
-      dispatch(cartInit(cartItems));
-    }
-    if (shippingAddress) {
-      dispatch(shippingAddressInit(shippingAddress));
-    }
+  //   if (cartItems) {
+  //     dispatch(cartInit(cartItems));
+  //   }
+  //   if (shippingAddress) {
+  //     dispatch(shippingAddressInit(shippingAddress));
+  //   }
 
-    if (paymentMethod) {
-      dispatch(paymentMethodInit(paymentMethod));
-    }
-  }, [order]);
+  //   if (paymentMethod) {
+  //     dispatch(paymentMethodInit(paymentMethod));
+  //   }
+  // }, [order]);
 
   return (
     <Fragment>

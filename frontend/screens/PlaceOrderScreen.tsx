@@ -29,7 +29,7 @@ const PlaceOrderScreen = () => {
 
   const [createOrder, { isLoading, isError, error }] = useCreateOrderMutation();
 
-  const { user } = useSelector((state: AppState) => state.auth);
+  const { user, token } = useSelector((state: AppState) => state.auth);
 
   // calculate price
   const addDecimals = (n: number) =>
@@ -50,7 +50,7 @@ const PlaceOrderScreen = () => {
     (Number(itemsPrice) + Number(shippingPrice) + Number(taxPrice)).toFixed(2)
   );
 
-  const { order, success, loading } = useSelector(
+  const { currentOrder, success, loading } = useSelector(
     (state: AppState) => state.order
   );
 
@@ -66,7 +66,8 @@ const PlaceOrderScreen = () => {
 
   const placeOrderHandler = async (e: FormEvent) => {
     e.preventDefault();
-    if (paymentMethod && user && user.token) {
+    console.log(console.log(paymentMethod, user, token));
+    if (paymentMethod && user && token) {
       const order = await createOrder({
         orderItems: cartProducts,
         shippingAddress: shippingAddress as IShippingAddress,
@@ -75,9 +76,11 @@ const PlaceOrderScreen = () => {
         shippingPrice,
         taxPrice,
         totalPrice,
-        token: user.token,
+        token: token,
         isPaid: false,
       });
+
+      console.log(order);
 
       if ("data" in order) {
         dispatch(setOrder(order.data));

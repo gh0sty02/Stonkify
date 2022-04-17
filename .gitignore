@@ -18,6 +18,7 @@ frontend/.env
 backend/.dist/
 backend/.env/
 backend/node_modules/
+/todos.txt
 
 
 

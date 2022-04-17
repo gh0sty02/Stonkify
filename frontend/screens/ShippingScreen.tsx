@@ -12,9 +12,9 @@ import { IProduct } from "interfaces/products.interface";
 import { IShippingAddress } from "interfaces/orderUtils.interface";
 
 const ShippingScreen: FC<{
-  shippingAddress: IShippingAddress | undefined;
-  cartItems: IProduct[] | undefined;
-}> = ({ shippingAddress, cartItems }) => {
+  // shippingAddress: IShippingAddress | undefined;
+  // cartItems: IProduct[] | undefined;
+}> = () => {
   const { user } = useSelector((state: AppState) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -24,17 +24,17 @@ const ShippingScreen: FC<{
   const [postalCode, setPostalCode] = useState<string>("");
   const [country, setCountry] = useState<string>("");
 
-  useEffect(() => {
-    if (!cartItems) {
-      router.push("/cart");
-    }
-    if (shippingAddress) {
-      setAddress(shippingAddress.address);
-      setCity(shippingAddress.city);
-      setPostalCode(shippingAddress.postalCode);
-      setCountry(shippingAddress.country);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!cartItems) {
+  //     router.push("/cart");
+  //   }
+  //   if (shippingAddress) {
+  //     setAddress(shippingAddress.address);
+  //     setCity(shippingAddress.city);
+  //     setPostalCode(shippingAddress.postalCode);
+  //     setCountry(shippingAddress.country);
+  //   }
+  // }, []);
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();

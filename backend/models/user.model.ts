@@ -26,6 +26,20 @@ const userSchema = new mongoose.Schema<IUserDocument>(
       type: Boolean,
       required: true,
     },
+    orders: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Order",
+        default: [],
+      },
+    ],
+    cartItems: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Cart",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,

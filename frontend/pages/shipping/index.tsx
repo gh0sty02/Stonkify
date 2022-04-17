@@ -16,23 +16,23 @@ const Shipping = () => {
   const [_, { isLoading, isError }] = useLoginMutation();
   const { user } = useSelector((state: AppState) => state.auth);
 
-  const { cartItems, shippingAddress } = initData();
+  // const { cartItems, shippingAddress } = initData();
 
-  useEffect(() => {
-    if (user) {
-      dispatch(userInit(user));
-    } else {
-      router.push("/login");
-      return;
-    }
+  // useEffect(() => {
+  //   if (user) {
+  //     dispatch(userInit(user));
+  //   } else {
+  //     router.push("/login");
+  //     return;
+  //   }
 
-    if (cartItems) {
-      dispatch(cartInit(cartItems));
-    }
-    if (shippingAddress) {
-      dispatch(shippingAddressInit(shippingAddress));
-    }
-  }, [user, cartItems, shippingAddress]);
+  //   if (cartItems) {
+  //     dispatch(cartInit(cartItems));
+  //   }
+  //   if (shippingAddress) {
+  //     dispatch(shippingAddressInit(shippingAddress));
+  //   }
+  // }, [user, cartItems, shippingAddress]);
 
   return (
     <Fragment>
@@ -41,8 +41,8 @@ const Shipping = () => {
       </Head>
       <div>
         <ShippingScreen
-          cartItems={cartItems}
-          shippingAddress={shippingAddress}
+        // cartItems={cartItems}
+        // shippingAddress={shippingAddress}
         />
       </div>
     </Fragment>

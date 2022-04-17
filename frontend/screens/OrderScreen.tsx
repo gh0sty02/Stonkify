@@ -33,6 +33,8 @@ const OrderScreen = () => {
   const { currentOrder: order, error, loading } = state.order;
   const { user } = state.auth;
 
+  console.log(order);
+
   const IdQueries = router.query.id as string[];
 
   const deliverProductHandler = () => {
@@ -136,7 +138,7 @@ const OrderScreen = () => {
 
                     <ListGroup.Item>
                       <h2>Order Items</h2>
-                      {order.orderItems.length === 0 ? (
+                      {order && order?.orderItems.length === 0 ? (
                         <Message>Your Cart is Empty</Message>
                       ) : (
                         <ListGroup variant="flush">
