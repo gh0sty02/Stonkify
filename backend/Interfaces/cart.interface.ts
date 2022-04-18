@@ -1,18 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-interface ICartItem {
-  _id: {
-    type: mongoose.Schema.Types.ObjectId;
-    ref: "Product";
-    required: true;
-  };
-  qty: { type: Number; required: true };
-  name: { type: String; required: true };
-  price: { type: Number; required: true };
-  image: { type: String; required: true };
+export interface ICartItem {
+  productId: string;
+  qty: Number;
+  name: String;
+  price: Number;
+  image: String;
+  _id?: mongoose.Schema.Types.ObjectId;
 }
 
-export interface ICartDetails extends mongoose.Document {
-  user: mongoose.Schema.Types.ObjectId;
-  cartItems: ICartItem[];
-}
+// export interface ICartDetails extends Document {
+//   user: mongoose.Schema.Types.ObjectId;
+//   cartItems: mongoose.Schema.Types.ObjectId[];
+// }

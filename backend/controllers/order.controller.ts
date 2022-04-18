@@ -58,6 +58,7 @@ export const addOrderItems = async (
         await session.commitTransaction();
         res.status(201).json(order);
       } catch (error) {
+        session.abortTransaction();
         throw error;
       }
     }

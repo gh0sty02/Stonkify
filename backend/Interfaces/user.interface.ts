@@ -1,4 +1,5 @@
-import { ICartDetails } from "./cart.interface";
+import mongoose from "mongoose";
+import { ICartItem } from "./cart.interface";
 import { IOrderDetails } from "./order.interface";
 
 export default interface IUser {
@@ -9,6 +10,6 @@ export default interface IUser {
   isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
-  orders: IOrderDetails[];
-  cartItems: ICartDetails[];
+  orders: mongoose.Schema.Types.ObjectId[];
+  cartItems: mongoose.Schema.Types.ObjectId[];
 }

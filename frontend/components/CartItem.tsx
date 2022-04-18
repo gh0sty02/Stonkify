@@ -1,11 +1,10 @@
+import { ICartItem } from "interfaces/cart.interface";
 import Link from "next/link";
 import { FC } from "react";
 import { ListGroup, Row, Col, Form, Button, Image } from "react-bootstrap";
 
-import { cartProduct } from "interfaces/orderUtils.interface";
-
 const CartItem: FC<{
-  item: Partial<cartProduct>;
+  item: ICartItem;
   onRemoveFromCardHandler: (id: string) => void;
   onChangeQty: (id: string, qty: number) => void;
 }> = ({ item, onRemoveFromCardHandler, onChangeQty }) => {
@@ -32,7 +31,7 @@ const CartItem: FC<{
               onChangeQty(item!._id as string, Number(e.target.value));
             }}
           >
-            {[...Array(item.countInStock).keys()].map((x) => (
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((x) => (
               <option key={x + 1} value={x + 1}>
                 {x + 1}
               </option>

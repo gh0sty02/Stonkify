@@ -9,6 +9,7 @@ import { connectDB } from "./config/db";
 import productRouter from "./routes/product.router";
 import userRouter from "./routes/user.router";
 import uploadRouter from "./routes/upload.router";
+import CartRouter from "./routes/cart.router";
 import { errorHandler, notFound } from "./middleware/error.middleware";
 import IUser from "Interfaces/user.interface";
 
@@ -46,6 +47,7 @@ app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/upload", uploadRouter);
+app.use("/api/cart", CartRouter);
 
 app.use("/images/", express.static(path.join(__dirname, "images")));
 

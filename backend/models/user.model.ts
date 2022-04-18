@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema<IUserDocument>(
     cartItems: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Cart",
+        ref: "CartItem",
         default: [],
       },
     ],

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
+import { ICartItem } from "interfaces/cart.interface";
 import { cartType, IShippingAddress } from "interfaces/orderUtils.interface";
 import { IProduct } from "interfaces/products.interface";
 import { addToCart } from "./asyncActions/cartActions";
@@ -30,7 +30,7 @@ export const cartSlice = createSlice({
         }
       }
     },
-    cartInit: (state, { payload }: PayloadAction<IProduct[]>) => {
+    cartInit: (state, { payload }: PayloadAction<ICartItem[]>) => {
       state.cartItems = payload;
     },
     cartReset: (state) => {
@@ -60,36 +60,36 @@ export const cartSlice = createSlice({
     },
   },
 
-  extraReducers: (builder) => {
-    builder.addCase(addToCart.fulfilled, (state, { payload }) => {
-      const existedItem = state.cartItems.find((p) => p._id === payload._id);
+  // extraReducers: (builder) => {
+  //   builder.addCase(addToCart.fulfilled, (state, { payload }) => {
+  //     const existedItem = state.cartItems.find((p) => p._id === payload._id);
 
-      const item = payload;
+  //     const item = payload;
 
-      if (existedItem) {
-        state.cartItems = state.cartItems.map((p) => {
-          if (p._id === existedItem._id) {
-            return item;
-          } else {
-            return p;
-          }
-        });
-        state.loading = false;
-      } else {
-        state.cartItems = state.cartItems.concat(payload);
+  //     if (existedItem) {
+  //       state.cartItems = state.cartItems.map((p) => {
+  //         if (p._id === existedItem._id) {
+  //           return item;
+  //         } else {
+  //           return p;
+  //         }
+  //       });
+  //       state.loading = false;
+  //     } else {
+  //       state.cartItems = state.cartItems.concat(payload);
 
-        state.loading = false;
-      }
-      localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
-    });
-    builder.addCase(addToCart.pending, (state, { payload }) => {
-      state.loading = true;
-    }),
-      builder.addCase(addToCart.rejected, (state, { payload }) => {
-        state.loading = false;
-        state.error = payload;
-      });
-  },
+  //       state.loading = false;
+  //     }
+  //     localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+  //   });
+  //   builder.addCase(addToCart.pending, (state, { payload }) => {
+  //     state.loading = true;
+  //   }),
+  //     builder.addCase(addToCart.rejected, (state, { payload }) => {
+  //       state.loading = false;
+  //       state.error = payload;
+  //     });
+  // },
 });
 
 export const {

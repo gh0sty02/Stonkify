@@ -18,11 +18,13 @@ import { useRouter } from "next/router";
 
 import Loader from "components/Loader";
 import Message from "components/Message";
-import { addToCart } from "reducers/asyncActions/cartActions";
+// import { addToCart } from "reducers/asyncActions/cartActions";
 import { createReview } from "reducers/asyncActions/reviewActions";
 import { useGetProductQuery } from "services/productsApi";
 import { IProduct } from "interfaces/products.interface";
 import RequestError from "interfaces/requestError.interface";
+import { useAddToCartMutation } from "services/cartApi";
+import { cartInit } from "reducers/cartSlice";
 
 const ProductScreen: FC<{ id: string; product: IProduct }> = ({
   id,
@@ -33,7 +35,8 @@ const ProductScreen: FC<{ id: string; product: IProduct }> = ({
   const [comment, setComment] = useState<string>(" ");
   const router = useRouter();
   const dispatch = useDispatch();
-
+  const [addToCart, { isLoading: addToCartLoading, error: addToCartError }] =
+    useAddToCartMutation();
   const state = useSelector((state: AppState) => state);
 
   const { isLoading, isError, error } = useGetProductQuery(id);
@@ -46,10 +49,24 @@ const ProductScreen: FC<{ id: string; product: IProduct }> = ({
   //   setRating(0);
   //   setComment(" ");
   // }, [reviewSuccess]);
+  // useEffect(() => {
+  //   if (!addToCartLoading) {
+  //     router.push(`/cart/${id}?qty=${qty}`, undefined, { shallow: true });
+  //   }
+  // }, [addToCartLoading]);
 
-  const addToCartHandler = () => {
-    dispatch(addToCart({ id, qty }));
-    router.push(`/cart/${id}?qty=${qty}`, undefined, { shallow: true });
+  const addToCartHandler = async () => {
+    console.log(product.image, product.name, product.price, qty, product._id);
+    const result = await addToCart({
+      image: product.image,
+      name: product.name,
+      price: product.price,
+      qty,
+      productId: product._id,
+    });
+    if ("data" in result) {
+      dispatch(cartInit(result.data));
+    }
   };
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();

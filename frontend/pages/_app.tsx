@@ -12,16 +12,23 @@ import { NextPage } from "next";
 import { useTokenLoginMutation } from "services/userApi";
 import { useTokenLogin } from "utils/useTokenLogin";
 import { setCredentials } from "reducers/authSlice";
-import { orderApi, useGetMyOrdersMutation } from "services/orderApi";
+import {
+  orderApi,
+  useGetAllOrdersQuery,
+  useGetMyOrdersMutation,
+} from "services/orderApi";
 import { IOrder } from "interfaces/orderUtils.interface";
 import { setUserOrders } from "reducers/orderSlice";
+import { useGetAllCartItemsMutation } from "services/cartApi";
+import { cartInit } from "reducers/cartSlice";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [tokenLogin] = useTokenLoginMutation();
   const [getMyOrders] = useGetMyOrdersMutation();
+  const [getAllCartItems] = useGetAllCartItemsMutation();
   const dispatch = useDispatch();
 
-  const initializeToken = async (token: string) => {
+  const initializeTokenLogin = async (token: string) => {
     const user = await tokenLogin({ token });
 
     if ("data" in user) {
@@ -31,6 +38,14 @@ function MyApp({ Component, pageProps }: AppProps) {
           user: user.data,
         })
       );
+    }
+  };
+
+  const initalizeCart = async (token: string) => {
+    const cart = await getAllCartItems(token);
+
+    if ("data" in cart) {
+      dispatch(cartInit(cart.data));
     }
   };
 
@@ -47,7 +62,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (typeof window !== "undefined") {
       token = localStorage.getItem("user");
       if (token) {
-        initializeToken(token);
+        initializeTokenLogin(token);
+        initalizeCart(token);
       }
     }
   }, []);

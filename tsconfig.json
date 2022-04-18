@@ -13,10 +13,14 @@
     /* Module Resolution Options */
     "moduleResolution": "node",
     "baseUrl": "./backend/",
-    "rootDir": "./backend/",
+    // "rootDir": "./backend/",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "paths": {
+      "backend/*": ["./backend/*"]
+    }
   },
-  "include": ["./backend/**/*"]
+  "include": ["./backend/**/*"],
+  "exclude": ["./backend/node_modules/**/*"]
 }

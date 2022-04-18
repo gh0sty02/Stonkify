@@ -1,4 +1,5 @@
 import { IProduct } from "interfaces/products.interface";
+import { ICartItem } from "./cart.interface";
 
 export interface IShippingAddress {
   address: string;
@@ -7,12 +8,12 @@ export interface IShippingAddress {
   country: string;
 }
 
-export interface cartProduct extends IProduct {
-  qty: number;
-}
+// export interface cartProduct extends IProduct {
+//   qty: number;
+// }
 
 export type cartType = {
-  cartItems: Partial<cartProduct>[];
+  cartItems: ICartItem[];
   shippingAddress?: IShippingAddress | null;
   loading: boolean;
   error: any;

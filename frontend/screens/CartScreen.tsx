@@ -15,9 +15,14 @@ import { useDispatch, useSelector } from "react-redux";
 import CartItem from "components/CartItem";
 import Message from "components/Message";
 import { addToCart } from "reducers/asyncActions/cartActions";
-import { removeItem } from "reducers/cartSlice";
+import { cartInit, removeItem } from "reducers/cartSlice";
 
 import { AppState, wrapper } from "store";
+import {
+  useAddToCartMutation,
+  useChangeQtyMutation,
+  useRemoveFromCartMutation,
+} from "services/cartApi";
 
 const CartScreen = () => {
   const dispatch = useDispatch();
@@ -26,16 +31,26 @@ const CartScreen = () => {
     (state: AppState) => state.cart
   );
 
-  const dispatchChangeQty = (id: string, qty: number) => {
-    dispatch(addToCart({ id, qty }));
+  const [changeQty, { isLoading: addToCartLoading, error: addToCartError }] =
+    useChangeQtyMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+
+  const dispatchChangeQty = async (id: string, qty: number) => {
+    const result = await changeQty({ id, qty });
+    if ("data" in result) {
+      dispatch(cartInit(result.data));
+    }
   };
 
   const checkOutHandler = () => {
     router.push("/login?redirect=shipping", undefined, { shallow: true });
   };
 
-  const removeFromCartHandler = (id: string) => {
-    dispatch(removeItem(id));
+  const removeFromCartHandler = async (id: string) => {
+    const result = await removeFromCart(id);
+    if ("data" in result) {
+      dispatch(cartInit(result.data));
+    }
   };
   return (
     <>
