@@ -8,4 +8,5 @@ export interface IUserData {
   email: string;
   password: string;
   token?: string;
+  isAdmin?: boolean;
 }

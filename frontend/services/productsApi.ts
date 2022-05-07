@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ILoginFormData, IUserData } from "interfaces/formdata.interface";
 import { IProduct } from "interfaces/products.interface";
 import { HYDRATE } from "next-redux-wrapper";
+import { REHYDRATE } from "redux-persist";
 
 import { AppState } from "store";
 
@@ -10,7 +11,7 @@ export const productsApi = createApi({
   reducerPath: "products",
   tagTypes: ["product"],
   extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
+    if (action.type === REHYDRATE) {
       return action.payload[reducerPath];
     }
   },

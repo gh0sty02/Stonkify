@@ -1,5 +1,5 @@
 import { IProduct } from "interfaces/products.interface";
-import { ICartItem } from "./cart.interface";
+import { ICartItem, ICartItemDetails } from "./cart.interface";
 
 export interface IShippingAddress {
   address: string;
@@ -13,11 +13,12 @@ export interface IShippingAddress {
 // }
 
 export type cartType = {
-  cartItems: ICartItem[];
+  cartItems: ICartItemDetails[];
   shippingAddress?: IShippingAddress | null;
   loading: boolean;
   error: any;
   paymentMethod: string | null;
+  tempCartItems: ICartItem[] | null;
 };
 
 export interface IOrder {

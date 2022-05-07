@@ -166,12 +166,42 @@ export const updateOrderToDelivered = async (
       order.isDelivered = true;
       order.deliveredAt = Date.now();
 
+      console.log(order);
       const updatedOrder = await order.save();
 
       return res.status(200).json(updatedOrder);
     } else {
       res.status(404);
       throw new Error("Order not found");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteAllOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const session = await mongoose.startSession({
+      defaultTransactionOptions: {
+        writeConcern: { w: "majority" },
+        readConcern: { level: "majority" },
+      },
+    });
+    session.startTransaction();
+    try {
+      const user = await User.findById(req.user?._id).session(session);
+      await user?.orders.splice(0, user?.orders.length);
+      await Order.deleteMany({ user: req.user?._id }, { session });
+      await user?.save({ session });
+
+      await session.commitTransaction();
+      res.status(201).json(user);
+    } catch (error) {
+      throw new Error(error.message);
     }
   } catch (error) {
     next(error);

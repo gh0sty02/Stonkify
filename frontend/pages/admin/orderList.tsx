@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { getAllOrders } from "reducers/asyncActions/orderActions";
 import { userInit } from "reducers/userInfoSlice";
 import OrderListScreen from "screens/OrderListScreen";
-import { initData } from "utils/initData";
+import { initData } from "utils/initDataOld";
 
 const UserList = () => {
   const dispatch = useDispatch();

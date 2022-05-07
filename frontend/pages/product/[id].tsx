@@ -4,6 +4,7 @@ import {
   GetStaticProps,
   GetStaticPropsContext,
 } from "next";
+import { getSession, useSession } from "next-auth/react";
 import { FC, useEffect } from "react";
 import { Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,15 +21,21 @@ import {
   productsApi,
   useGetProductQuery,
 } from "services/productsApi";
+import { useUpdateUserMutation } from "services/userApi";
 import Loader from "src/components/Loader";
 import { AppState, makeStore, wrapper } from "store";
-import { initData } from "utils/initData";
+import { initData } from "utils/initDataOld";
 
 const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
   id,
   product,
 }) => {
   const dispatch = useDispatch();
+  const session = useSession();
+  console.log(session);
+  const token = session.data?.accessToken as string;
+
+  const { isLoading, isError, data } = useGetProductQuery(id);
 
   useEffect(() => {
     if (!product) {
@@ -40,22 +47,7 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
     (state: AppState) => state.productReview
   );
 
-  const { isLoading, isError, data } = useGetProductQuery(id);
-
   // const { user, cartItems, shippingAddress } = initData();
-
-  // useEffect(() => {
-  //   if (user) {
-  //     dispatch(userInit(user));
-  //   }
-
-  //   if (cartItems) {
-  //     dispatch(cartInit(cartItems));
-  //   }
-  //   if (shippingAddress) {
-  //     dispatch(shippingAddressInit(shippingAddress));
-  //   }
-  // }, [user, shippingAddress, cartItems]);
 
   // useEffect(() => {
   //   if (success) {
@@ -66,10 +58,10 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
   // }, [success]);
 
   return (
-    <div>
+    <>
       {isLoading && <Loader />}
-      {product && <ProductScreen id={id} product={product} />}
-    </div>
+      {data && <ProductScreen id={id} currentProduct={data} />}
+    </>
   );
 };
 
@@ -118,27 +110,24 @@ export const getStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = wrapper.getStaticProps<{
   id: string;
   product: IProduct | null;
+  // @ts-ignore
 }>((store) => async (context: GetStaticPropsContext) => {
   const id = context.params?.id as string;
 
   if (id) {
-    const data = (await store.dispatch(getProduct.initiate(id)))
-      .data as IProduct;
+    // const data = (await store.dispatch(getProduct.initiate(id)))
+    //   .data as IProduct;
+    const data = await store.dispatch(getProduct.initiate(id));
     await Promise.all(getRunningOperationPromises());
-
-    return {
-      props: {
-        id,
-        product: data,
-      },
-    };
-  } else {
-    return {
-      props: {
-        id: "",
-        product: null,
-      },
-    };
+    if ("data" in data) {
+      return {
+        props: {
+          id,
+          product: data.data,
+          revalidate: 10,
+        },
+      };
+    }
   }
 });
 

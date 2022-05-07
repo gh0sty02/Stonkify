@@ -5,7 +5,8 @@ import { useDispatch } from "react-redux";
 import { cartInit, shippingAddressInit } from "reducers/cartSlice";
 import { userInit } from "reducers/userInfoSlice";
 import PaymentScreen from "screens/PaymentMethodScreen";
-import { initData } from "utils/initData";
+import { wrapper } from "store";
+import { initData } from "utils/initDataOld";
 
 const PaymentMethod = () => {
   // const { user, cartItems, shippingAddress, paymentMethod } = initData();
@@ -34,5 +35,14 @@ const PaymentMethod = () => {
     </Fragment>
   );
 };
+
+export const getServerSideProps = wrapper.getServerSideProps(
+  (store) =>
+    async ({ req, res }) => {
+      return {
+        props: {},
+      };
+    }
+);
 
 export default PaymentMethod;

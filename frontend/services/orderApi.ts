@@ -1,13 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { IOrder, IOrderDetails } from "interfaces/orderUtils.interface";
 import { HYDRATE } from "next-redux-wrapper";
+import { REHYDRATE } from "redux-persist";
 import { AppState } from "store";
 
 export const orderApi = createApi({
   reducerPath: "orders",
   tagTypes: ["orders", "order"],
   extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
+    if (action.type === REHYDRATE) {
       return action.payload[reducerPath];
     }
   },
@@ -28,18 +29,56 @@ export const orderApi = createApi({
     getAllOrders: builder.query<IOrder[], null>({
       query: () => `/`,
     }),
-    getOrder: builder.mutation<IOrder, string>({
-      query: (id) => `/${id}`,
-    }),
-    createOrder: builder.mutation<IOrder, IOrderDetails>({
-      query: (orderDetails) => ({
-        url: "",
-        method: "POST",
-        body: orderDetails,
+    getOrder: builder.mutation<IOrder, { orderId: string; token: string }>({
+      query: (data) => ({
+        url: `/${data.orderId}`,
         headers: {
-          "Content-Type": "application/json",
+          authorization: `Bearer ${data.token}`,
         },
       }),
+    }),
+    changePaymentStatus: builder.mutation<
+      IOrder,
+      { orderId: string; token: string }
+    >({
+      query: (data) => {
+        console.log(data);
+        return {
+          url: `/${data.orderId}/pay`,
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${data.token}`,
+          },
+        };
+      },
+    }),
+    changeDeliveryStatus: builder.mutation<
+      IOrder,
+      { orderId: string; token: string }
+    >({
+      query: (data) => ({
+        url: `/${data.orderId}/deliver`,
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${data.token}`,
+        },
+      }),
+    }),
+    createOrder: builder.mutation<IOrder, IOrderDetails>({
+      query: (orderDetails) => {
+        console.log(orderDetails);
+        return {
+          url: "",
+          method: "POST",
+          body: orderDetails,
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${(orderDetails as IOrderDetails).token}`,
+          },
+        };
+      },
     }),
     deliverOrder: builder.mutation<IOrder, string>({
       query: (id) => ({
@@ -51,8 +90,8 @@ export const orderApi = createApi({
         },
       }),
     }),
-    getMyOrders: builder.mutation<Partial<IOrder[]>, { token: string }>({
-      query: ({ token }) => ({
+    getMyOrders: builder.mutation<Partial<IOrder[]>, string>({
+      query: (token) => ({
         url: `/myorders`,
         method: "GET",
 
@@ -71,8 +110,14 @@ export const {
   useGetMyOrdersMutation,
   useGetOrderMutation,
   useCreateOrderMutation,
-
+  useChangeDeliveryStatusMutation,
   util: { getRunningOperationPromises },
 } = orderApi;
 
-export const { getAllOrders, getOrder } = orderApi.endpoints;
+export const {
+  getAllOrders,
+  getOrder,
+  changePaymentStatus,
+  changeDeliveryStatus,
+  getMyOrders,
+} = orderApi.endpoints;

@@ -1,98 +1,61 @@
 import "styles/globals.css";
-import type { AppProps } from "next/app";
-import React, { useEffect, useState } from "react";
+import type { AppContext, AppInitialProps, AppProps } from "next/app";
+import React, { useEffect } from "react";
 import Header from "components/Header";
 import Footer from "components/Footer";
 import "styles/bootstrap.min.css";
-import { FC } from "react";
-import { AppState, makeStore, persistor, wrapper } from "store";
-import { PersistGate } from "reduxjs-toolkit-persist/integration/react";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import { NextPage } from "next";
-import { useTokenLoginMutation } from "services/userApi";
-import { useTokenLogin } from "utils/useTokenLogin";
-import { setCredentials } from "reducers/authSlice";
+import { AppState, makeStore, wrapper } from "store";
 import {
-  orderApi,
-  useGetAllOrdersQuery,
-  useGetMyOrdersMutation,
-} from "services/orderApi";
-import { IOrder } from "interfaces/orderUtils.interface";
-import { setUserOrders } from "reducers/orderSlice";
-import { useGetAllCartItemsMutation } from "services/cartApi";
+  tokenLogin,
+  getRunningOperationPromises as getRunningOperationPromisesUsers,
+  useTokenLoginMutation,
+} from "services/userApi";
+import {
+  getAllCartItems,
+  getRunningOperationPromises as getRunningOperationPromisesCart,
+  useGetAllCartItemsMutation,
+} from "services/cartApi";
+import { CookiesProvider } from "react-cookie";
+import cookie from "cookie";
+import { parseCookies } from "utils/cookieParser";
+import { Request, Response } from "express";
+import { NextApiRequest, NextPage, NextPageContext } from "next";
 import { cartInit } from "reducers/cartSlice";
+import { setCredentials } from "reducers/authSlice";
+import { wrap } from "module";
+import { ICartItem, ICartItemDetails } from "interfaces/cart.interface";
+import App from "next/app";
+import { IncomingMessage } from "http";
+import { useDispatch, useSelector } from "react-redux";
+import { SessionProvider, useSession } from "next-auth/react";
+import IUser from "interfaces/user.interface";
 
-function MyApp({ Component, pageProps }: AppProps) {
-  const [tokenLogin] = useTokenLoginMutation();
-  const [getMyOrders] = useGetMyOrdersMutation();
-  const [getAllCartItems] = useGetAllCartItemsMutation();
-  const dispatch = useDispatch();
+function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+  // const [tokenLogin] = useTokenLoginMutation();
+  // const [getAllCartItems] = useGetAllCartItemsMutation();
+  // const dispatch = useDispatch();
 
-  const initializeTokenLogin = async (token: string) => {
-    const user = await tokenLogin({ token });
+  // const initData = async (token: string) => {
+  //   const cart = await getAllCartItems(token);
+  //   const user = await tokenLogin({ token });
+  //   if ("data" in cart && "data" in user) {
+  //     dispatch(cartInit(cart.data));
+  //     dispatch(setCredentials({ user: user.data, token }));
+  //   }
+  // };
 
-    if ("data" in user) {
-      dispatch(
-        setCredentials({
-          token,
-          user: user.data,
-        })
-      );
-    }
-  };
-
-  const initalizeCart = async (token: string) => {
-    const cart = await getAllCartItems(token);
-
-    if ("data" in cart) {
-      dispatch(cartInit(cart.data));
-    }
-  };
-
-  const useInitUserOrders = async (token: string) => {
-    const orders = await getMyOrders({ token });
-
-    if ("data" in orders) {
-      dispatch(setUserOrders(orders.data as IOrder[]));
-    }
-  };
-
-  useEffect(() => {
-    let token;
-    if (typeof window !== "undefined") {
-      token = localStorage.getItem("user");
-      if (token) {
-        initializeTokenLogin(token);
-        initalizeCart(token);
-      }
-    }
-  }, []);
+  const { cartItems } = useSelector((state: AppState) => state.cart);
+  const { user: stateUser } = useSelector((state: AppState) => state.auth);
 
   return (
-    <>
-      <Header />
-      <Component {...pageProps} />
-      <Footer />
-    </>
+    <SessionProvider session={session}>
+      <CookiesProvider>
+        <Header totalCartItems={cartItems.length} stateUser={stateUser} />
+        <Component {...pageProps} />
+        <Footer />
+      </CookiesProvider>
+    </SessionProvider>
   );
 }
-
-// MyApp.getInitialProps = async ({ req, res }) => {
-//   const store = makeStore();
-//   const token = store.getState().auth.token as string;
-
-//   if (token) {
-//     res?.setHeader("user", token);
-
-//     console.log("token", res?.getHeader("user"));
-//   }
-//   console.log("no token");
-
-//   return {
-//     props: {
-//       token,
-//     },
-//   };
-// };
 
 export default wrapper.withRedux(MyApp);

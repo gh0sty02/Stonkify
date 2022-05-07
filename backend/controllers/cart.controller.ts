@@ -15,29 +15,39 @@ export const addItemToCart = async (
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const cartItem = new CartItem(
-        {
-          productId,
-          price,
-          qty,
-          image,
-          name,
-        },
-        { session }
-      );
-      await cartItem.save({ session });
+      const cartItem = await CartItem.find({ productId });
+      if (cartItem.length > 0) {
+        console.log(cartItem);
+        await CartItem.updateOne({ productId }, { $inc: { qty: qty } });
 
-      const user = await User.findById(req.user?._id).session(session);
-      await user?.cartItems.push(
-        cartItem._id as mongoose.Schema.Types.ObjectId
-      );
-      await user?.save({ session });
+        await session.commitTransaction();
+        return res.status(200).json(cartItem);
+      } else {
+        console.log("new");
+        const newCartItem = new CartItem(
+          {
+            productId,
+            price,
+            qty,
+            image,
+            name,
+          },
+          { session }
+        );
+        await newCartItem.save({ session });
 
-      // await cartItem.populate("user", "name email");
-      const cartItems = await CartItem.find({ user: req.user?._id });
-      session.commitTransaction();
+        const user = await User.findById(req.user?._id).session(session);
+        await user?.cartItems.push(
+          newCartItem._id as mongoose.Schema.Types.ObjectId
+        );
+        await user?.save({ session });
 
-      res.status(200).json(cartItems);
+        // await cartItem.populate("user", "name email");
+        const cartItems = await CartItem.find({ user: req.user?._id });
+        session.commitTransaction();
+
+        return res.status(200).json(cartItems);
+      }
     } catch (error) {
       session.abortTransaction();
       throw new Error(error.message);
@@ -116,6 +126,26 @@ export const getAllCartItems = async (
   try {
     const cartItems = await CartItem.find({ user: req.user?._id });
     res.status(200).json(cartItems);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cartInitAfterLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log(req.body.cartItems);
+    const user = await User.findById(req.user?._id);
+    const cartItems = user?.cartItems;
+
+    //@todo
+    // check for each Cartitem in req.body and if it is in user.cartItem, then increment the qty, if not create a new
+    // cartItem document and push it to user.cartItems and return cartItems
+
+    return res.json(cartItems);
   } catch (error) {
     next(error);
   }

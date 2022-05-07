@@ -9,48 +9,71 @@ import {
   Form,
   Button,
   Card,
+  Alert,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 
 import CartItem from "components/CartItem";
 import Message from "components/Message";
 import { addToCart } from "reducers/asyncActions/cartActions";
-import { cartInit, removeItem } from "reducers/cartSlice";
+import { cartInit, changeQty, removeFromCart } from "reducers/cartSlice";
 
 import { AppState, wrapper } from "store";
 import {
   useAddToCartMutation,
   useChangeQtyMutation,
+  useGetAllCartItemsMutation,
   useRemoveFromCartMutation,
 } from "services/cartApi";
+import { FC, useEffect, useState } from "react";
+import { ICartItem } from "interfaces/cart.interface";
+import Loader from "src/components/Loader";
+import { useSession } from "next-auth/react";
 
 const CartScreen = () => {
-  const dispatch = useDispatch();
   const router = useRouter();
-  const { cartItems, error, loading } = useSelector(
-    (state: AppState) => state.cart
-  );
+  const session = useSession();
+  const dispatch = useDispatch();
 
-  const [changeQty, { isLoading: addToCartLoading, error: addToCartError }] =
-    useChangeQtyMutation();
-  const [removeFromCart] = useRemoveFromCartMutation();
+  const [loading, setLoading] = useState(false);
+  const { cartItems } = useSelector((state: AppState) => state.cart);
+  const [getAllCartItems] = useGetAllCartItemsMutation();
+  // const [changeQty] = useChangeQtyMutation();
+  // const [removeFromCart] = useRemoveFromCartMutation();
+  const token = session.data?.accessToken as string;
 
-  const dispatchChangeQty = async (id: string, qty: number) => {
-    const result = await changeQty({ id, qty });
-    if ("data" in result) {
-      dispatch(cartInit(result.data));
+  // useEffect(() => {
+  //   if (token) {
+  //     setLoading(true);
+  //     getCartItems(token).then((data) => {
+  //       dispatch(cartInit(data));
+  //     });
+  //     setLoading(false);
+  //   }
+  // }, [token]);
+
+  const getCartItems = async (token: string) => {
+    const res = await getAllCartItems(token);
+    if ("data" in res) {
+      return res.data;
     }
+    return [];
+  };
+
+  const dispatchChangeQty = async (productId: string, qty: number) => {
+    dispatch(changeQty({ productId, qty }));
   };
 
   const checkOutHandler = () => {
     router.push("/login?redirect=shipping", undefined, { shallow: true });
   };
 
-  const removeFromCartHandler = async (id: string) => {
-    const result = await removeFromCart(id);
-    if ("data" in result) {
-      dispatch(cartInit(result.data));
-    }
+  const removeFromCartHandler = async (productId: string) => {
+    // const result = await removeFromCart({ cartItemId: id, token });
+    // if ("data" in result) {
+    //   dispatch(cartInit(result.data));
+    // }
+    dispatch(removeFromCart(productId));
   };
   return (
     <>
@@ -61,21 +84,24 @@ const CartScreen = () => {
         <Row>
           <Col md={8}>
             <h1>Shopping Cart</h1>
-            {cartItems.length === 0 ? (
-              <Message>
-                Your Cart is Empty <Link href="/">Go Back</Link>{" "}
-              </Message>
-            ) : (
+            {loading && <Loader />}
+            {cartItems.length !== 0 ? (
               <ListGroup variant="flush">
                 {cartItems.map((item) => (
                   <CartItem
                     item={item}
                     onRemoveFromCardHandler={removeFromCartHandler}
                     onChangeQty={dispatchChangeQty}
-                    key={item._id}
+                    key={item.productId}
                   />
                 ))}
               </ListGroup>
+            ) : loading ? (
+              <Loader />
+            ) : (
+              <Message>
+                Your Cart is Empty <Link href="/">Go Back</Link>{" "}
+              </Message>
             )}
           </Col>
           <Col md={4}>
@@ -114,17 +140,8 @@ const CartScreen = () => {
           </Col>
         </Row>
       </Container>
-      );
     </>
   );
 };
-export const getServerSideProps = wrapper.getServerSideProps(
-  (store) =>
-    async ({ query }) => {
-      return {
-        props: {},
-      };
-    }
-);
 
 export default CartScreen;

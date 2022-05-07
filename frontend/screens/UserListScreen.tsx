@@ -7,13 +7,27 @@ import Message from "components/Message";
 import { deleteUser } from "reducers/asyncActions/userActions";
 import { AppState } from "store";
 import { setUserSuccessFalse } from "reducers/adminUserSlice";
+import { FC } from "react";
+import { useGetAllUsersQuery } from "services/userApi";
+import IUser from "interfaces/user.interface";
+import RequestError from "interfaces/requestError.interface";
 
-const UserListScreen = () => {
+interface IProps {
+  data: {
+    users: IUser[];
+    user: Partial<IUser>;
+    token: string;
+  };
+}
+
+const UserListScreen: FC<IProps> = ({ data: { users, token, user } }) => {
   const dispatch = useDispatch();
-  const { users, loading, error } = useSelector(
-    (state: AppState) => state.adminUserSlice
-  );
-  const { user: currentUser } = useSelector((state: AppState) => state.user);
+  const { isLoading, isError, error, data, refetch } =
+    useGetAllUsersQuery(token);
+  // const { users, loading, error } = useSelector(
+  //   (state: AppState) => state.adminUserSlice
+  // );
+  // const { user: currentUser } = useSelector((state: AppState) => state.user);
 
   type data = {
     id: string;
@@ -31,14 +45,16 @@ const UserListScreen = () => {
   };
   return (
     <>
-      {users && currentUser?.token && currentUser?.isAdmin && (
+      {users && token && user.isAdmin && (
         <>
           <h1>Users</h1>
 
-          {loading ? (
+          {isLoading ? (
             <Loader />
           ) : error ? (
-            <Message varient="danger">{error}</Message>
+            <Message varient="danger">
+              {(error as RequestError).data.message}
+            </Message>
           ) : (
             <Table striped bordered hover responsive className="table-sm">
               <thead>
@@ -72,7 +88,7 @@ const UserListScreen = () => {
                     </td>
                     <td>{user._id}</td>
                     <td>
-                      <Link href={`/admin/user/${user._id}/edit`}>
+                      <Link href={`/admin/user/${user._id}`}>
                         <Button variant="light" className="btn-sm">
                           <i className="fas fa-edit"></i>
                         </Button>
@@ -83,7 +99,7 @@ const UserListScreen = () => {
                         onClick={() =>
                           deleteHandler({
                             id: user._id,
-                            token: currentUser.token as string,
+                            token: token,
                           })
                         }
                       >

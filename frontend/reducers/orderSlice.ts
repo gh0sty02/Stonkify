@@ -39,7 +39,6 @@ export const orderSlice = createSlice({
       state.currentOrder = null;
     },
     setOrder: (state, { payload }: PayloadAction<IOrder>) => {
-      console.log(payload);
       state.currentOrder = payload;
     },
     setUserOrders: (state, { payload }: PayloadAction<IOrder[]>) => {
@@ -51,5 +50,5 @@ export const orderSlice = createSlice({
   },
 });
 
-export const { orderInit, resetOrders, setOrder, setUserOrders } =
+export const { orderInit, resetOrders, setOrder, setUserOrders, setAllOrders } =
   orderSlice.actions;

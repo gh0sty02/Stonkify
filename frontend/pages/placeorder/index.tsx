@@ -11,8 +11,8 @@ import {
 } from "reducers/cartSlice";
 import { userInit } from "reducers/userInfoSlice";
 import PlaceOrderScreen from "screens/PlaceOrderScreen";
-import { AppState } from "store";
-import { initData } from "utils/initData";
+import { AppState, wrapper } from "store";
+import { initData } from "utils/initDataOld";
 
 const PlaceOrder = () => {
   const dispatch = useDispatch();
@@ -63,5 +63,14 @@ const PlaceOrder = () => {
     </Fragment>
   );
 };
+
+export const getServerSideProps = wrapper.getServerSideProps(
+  (store) =>
+    async ({ req, res }) => {
+      return {
+        props: {},
+      };
+    }
+);
 
 export default PlaceOrder;

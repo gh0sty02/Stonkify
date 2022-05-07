@@ -8,3 +8,9 @@ export interface IReview {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface IReviewData {
+  rating: number;
+  comment: string;
+  token: string;
+  productId: string;
+}

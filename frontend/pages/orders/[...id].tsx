@@ -1,46 +1,28 @@
-import { IOrder } from "interfaces/orderUtils.interface";
-import Head from "next/head";
-import { useRouter } from "next/router";
 import { FC, Fragment, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import Head from "next/head";
+import { useDispatch } from "react-redux";
+import { getSession } from "next-auth/react";
 
-import { setUpdateOrderStatusFalse } from "reducers/adminOrderSlice";
-import { getOrderDetails, payOrder } from "reducers/asyncActions/orderActions";
-import { cartReset, shippingAddressInit } from "reducers/cartSlice";
-import { orderInit, resetOrders, setOrder } from "reducers/orderSlice";
-import { userInit } from "reducers/userInfoSlice";
+import { IOrder } from "interfaces/orderUtils.interface";
+import IUser from "interfaces/user.interface";
+
 import OrderScreen from "screens/OrderScreen";
-import { getOrder, useGetOrderMutation } from "services/orderApi";
-import { AppState, makeStore, wrapper } from "store";
-import { initData } from "utils/initData";
 
-const Order: FC<{ id: string }> = ({ id }) => {
+import { wrapper } from "store";
+
+import { orderInit, resetOrders } from "reducers/orderSlice";
+import { changePaymentStatus, getOrder } from "services/orderApi";
+import { tokenLogin } from "services/userApi";
+
+const Order: FC<{ order: IOrder; user: Partial<IUser>; token: string }> = ({
+  order,
+  user,
+  token,
+}) => {
   const dispatch = useDispatch();
-  const router = useRouter();
-  const isPaid = router.query["paid"];
-  const idQuery = router.query?.id as string[];
-  const [getOrder] = useGetOrderMutation();
-  const { currentOrder } = useSelector((state: AppState) => state.order);
-
-  let { user, token } = useSelector((state: AppState) => state.auth);
-
-  // let { updateOrderStatus } = useSelector(
-  //   (state: AppState) => state.adminOrderSlice
-  // );
-
-  const getCurrentOrder = async (id: string) => {
-    const orders = await getOrder(id);
-
-    if ("data" in orders) {
-      dispatch(setOrder(orders.data as IOrder));
-    }
-  };
-
   useEffect(() => {
-    if (id && token) {
-      getCurrentOrder(id);
-    }
-  }, [id, token]);
+    dispatch(orderInit(order));
+  }, []);
 
   return (
     <Fragment>
@@ -48,19 +30,64 @@ const Order: FC<{ id: string }> = ({ id }) => {
         <Head>
           <title>Stonkify | Order Details</title>
         </Head>
-        <OrderScreen />
+        {order && user && (
+          <OrderScreen order={order} user={user} token={token} />
+        )}
       </div>
     </Fragment>
   );
 };
 
 export const getServerSideProps = wrapper.getServerSideProps(
+  //@ts-ignore
   (store) => async (context) => {
-    const id = context.query.id as string;
+    const queries = context.query.id as string[];
+    const session_id = context.query.session_id as string;
+    const id = queries[0];
+    const session = await getSession({ req: context.req });
+    const token = session?.accessToken as string;
 
+    if (token && session_id) {
+      if (session_id) {
+        console.log("yes");
+        const data = await store.dispatch(
+          changePaymentStatus.initiate({ orderId: id, token })
+        );
+        if ("data" in data) {
+          store.dispatch(resetOrders());
+          return {
+            props: {
+              order: data.data as IOrder,
+              user: session?.user,
+              token,
+            },
+          };
+        }
+      }
+    }
+
+    if (token) {
+      const order = await store.dispatch(
+        getOrder.initiate({ orderId: id, token })
+      );
+      const user = await store.dispatch(tokenLogin.initiate(token));
+      if ("data" in order && "data" in user) {
+        return {
+          props: {
+            order: order.data,
+            user: user.data,
+            token,
+          },
+        };
+      }
+    }
     return {
       props: {
-        id,
+        order: null,
+        user: null,
+      },
+      redirect: {
+        pathname: "/login",
       },
     };
   }

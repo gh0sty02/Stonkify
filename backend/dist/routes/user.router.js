@@ -13,6 +13,7 @@ router
     .route("/profile")
     .get(auth_middleware_1.protect, user_controller_1.getUserProfile)
     .put(auth_middleware_1.protect, user_controller_1.updateUserProfile);
+router.post("/tokenlogin", user_controller_1.tokenLogin);
 router
     .use(auth_middleware_1.protect, auth_middleware_1.isAdmin)
     .route("/:id")

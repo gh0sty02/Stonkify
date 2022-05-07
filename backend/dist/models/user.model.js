@@ -31,11 +31,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
+const mongoose_1 = __importStar(require("mongoose"));
 const bcrypt = __importStar(require("bcryptjs"));
 const userSchema = new mongoose_1.default.Schema({
     name: {
@@ -56,6 +53,20 @@ const userSchema = new mongoose_1.default.Schema({
         type: Boolean,
         required: true,
     },
+    orders: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Order",
+            default: [],
+        },
+    ],
+    cartItems: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "CartItem",
+            default: [],
+        },
+    ],
 }, {
     timestamps: true,
 });

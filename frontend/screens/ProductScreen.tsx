@@ -9,6 +9,7 @@ import {
   Card,
   Button,
   Form,
+  Alert,
 } from "react-bootstrap";
 import Rating from "components/Rating";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,62 +25,72 @@ import { useGetProductQuery } from "services/productsApi";
 import { IProduct } from "interfaces/products.interface";
 import RequestError from "interfaces/requestError.interface";
 import { useAddToCartMutation } from "services/cartApi";
-import { cartInit } from "reducers/cartSlice";
+import { addToCart, cartInit } from "reducers/cartSlice";
+import { useSession } from "next-auth/react";
+import { useAddReviewMutation } from "services/reviewApi";
 
-const ProductScreen: FC<{ id: string; product: IProduct }> = ({
-  id,
-  product,
-}) => {
+const ProductScreen: FC<{
+  id: string;
+  currentProduct: IProduct;
+}> = ({ id, currentProduct }) => {
+  const product = currentProduct;
   const [qty, setQty] = useState<number>(1);
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>(" ");
+  const [reveiwStatus, setReviewStatus] = useState<boolean>(false);
+  const [
+    createReview,
+    { isError: isCreateReviewError, error: createReviewError },
+  ] = useAddReviewMutation();
+  const {
+    isLoading,
+    isError,
+    error,
+    data: fetchedProduct,
+    refetch,
+  } = useGetProductQuery(product._id);
   const router = useRouter();
   const dispatch = useDispatch();
-  const [addToCart, { isLoading: addToCartLoading, error: addToCartError }] =
-    useAddToCartMutation();
   const state = useSelector((state: AppState) => state);
-
-  const { isLoading, isError, error } = useGetProductQuery(id);
+  const session = useSession();
+  const token = session.data?.accessToken as string;
 
   const { error: reviewError, success: reviewSuccess } = state.productReview;
 
-  const { user } = state.auth;
-
-  // useEffect(() => {
-  //   setRating(0);
-  //   setComment(" ");
-  // }, [reviewSuccess]);
-  // useEffect(() => {
-  //   if (!addToCartLoading) {
-  //     router.push(`/cart/${id}?qty=${qty}`, undefined, { shallow: true });
-  //   }
-  // }, [addToCartLoading]);
+  useEffect(() => {
+    if (reviewSuccess) {
+      setReviewStatus(true);
+    }
+  }, [reviewSuccess]);
 
   const addToCartHandler = async () => {
-    console.log(product.image, product.name, product.price, qty, product._id);
-    const result = await addToCart({
-      image: product.image,
-      name: product.name,
-      price: product.price,
-      qty,
-      productId: product._id,
-    });
-    if ("data" in result) {
-      dispatch(cartInit(result.data));
-    }
-  };
-  const submitHandler = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (user && user.token && product?._id) {
+    if (!token) {
+      router.push("/login");
+    } else {
       dispatch(
-        createReview({
-          rating,
-          comment,
-          token: user.token,
+        addToCart({
+          image: product.image,
+          name: product.name,
+          price: product.price,
+          qty,
           productId: product._id,
         })
       );
+    }
+  };
+  const addReviewHandler = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (token && product?._id) {
+      console.log(rating);
+      const reviewData = await createReview({
+        review: { rating, comment, token, productId: product._id },
+        productId: product._id,
+        token,
+      });
+      if ("data" in reviewData) {
+        refetch();
+      }
     }
   };
 
@@ -197,6 +208,11 @@ const ProductScreen: FC<{ id: string; product: IProduct }> = ({
                     {product.reviews?.length === 0 && (
                       <Message>No Reviews</Message>
                     )}
+                    {isCreateReviewError && (
+                      <Alert variant="danger">
+                        {(createReviewError as RequestError).data.message}
+                      </Alert>
+                    )}
                     {product.reviews && (
                       <ListGroup variant="flush">
                         {product.reviews.map((review) => (
@@ -212,8 +228,8 @@ const ProductScreen: FC<{ id: string; product: IProduct }> = ({
                           {reviewError && (
                             <Message varient="danger">{reviewError}</Message>
                           )}
-                          {user ? (
-                            <Form onSubmit={submitHandler}>
+                          {token ? (
+                            <Form onSubmit={addReviewHandler}>
                               <Form.Group controlId="rating">
                                 <Form.Label>Rating</Form.Label>
                                 <Form.Control
@@ -253,6 +269,15 @@ const ProductScreen: FC<{ id: string; product: IProduct }> = ({
                         </ListGroup.Item>
                       </ListGroup>
                     )}
+                    {/* {!addToCartLoading && isSuccess && (
+                      <ListGroup variant="flush">
+                        <ListGroup.Item>
+                          <Alert variant="success">
+                            Product Added to the Cart !
+                          </Alert>
+                        </ListGroup.Item>
+                      </ListGroup>
+                    )} */}
                   </Col>
                 </Row>
               </Fragment>

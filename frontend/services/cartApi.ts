@@ -2,13 +2,15 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ICartItem, ICartItemDetails } from "interfaces/cart.interface";
 import { IOrder, IOrderDetails } from "interfaces/orderUtils.interface";
 import { HYDRATE } from "next-redux-wrapper";
+import { cartSlice } from "reducers/cartSlice";
+import { REHYDRATE } from "redux-persist";
 import { AppState } from "store";
 
 export const orderApi = createApi({
   reducerPath: "cart",
-  tagTypes: ["orders", "cartItem"],
+  tagTypes: ["cartItem"],
   extractRehydrationInfo(action, { reducerPath }) {
-    if (action.type === HYDRATE) {
+    if (action.type === REHYDRATE) {
       return action.payload[reducerPath];
     }
   },
@@ -27,45 +29,68 @@ export const orderApi = createApi({
 
   endpoints: (builder) => ({
     getAllCartItems: builder.mutation<ICartItem[], string>({
-      query: (id) => ({
-        url: `/`,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          authroization: `Bearer ${id}`,
-        },
-      }),
+      query: (id) => {
+        return {
+          url: `/`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${id}`,
+          },
+        };
+      },
     }),
-    addToCart: builder.mutation<ICartItem[], ICartItemDetails>({
+    addToCart: builder.mutation<
+      ICartItem[],
+      { cartItem: ICartItemDetails; token: string }
+    >({
       query: (data) => {
-        console.log(data);
         return {
           url: "/",
           method: "POST",
           body: data,
           headers: {
             "Content-Type": "application/json",
+            authorization: `Bearer ${data.token}`,
           },
         };
       },
     }),
-    changeQty: builder.mutation<ICartItem[], { id: string; qty: number }>({
-      query: ({ id, qty }) => ({
+    changeQty: builder.mutation<
+      ICartItem[],
+      { id: string; qty: number; token: string }
+    >({
+      query: ({ id, qty, token }) => ({
         url: `/${id}`,
         method: "PUT",
         body: { qty },
         headers: {
           "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
         },
       }),
     }),
-    removeFromCart: builder.mutation<ICartItem[], string>({
-      query: (id) => ({
-        url: `/${id}`,
+    removeFromCart: builder.mutation<
+      ICartItem[],
+      { cartItemId: string; token: string }
+    >({
+      query: (data) => ({
+        url: `/${data.cartItemId}`,
         method: "DELETE",
 
         headers: {
           "Content-Type": "application/json",
+          authorization: `Bearer ${data.token}`,
+        },
+      }),
+    }),
+    initCartAfterLogin: builder.mutation<ICartItem[], string>({
+      query: (id) => ({
+        url: `/init`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${id}`,
         },
       }),
     }),

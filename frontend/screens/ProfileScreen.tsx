@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FC, FormEvent, useEffect, useRef, useState } from "react";
 import { Button, Form, Row, Col, Container, Table } from "react-bootstrap";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,21 +16,27 @@ import { setCredentials } from "reducers/authSlice";
 import { IOrder } from "interfaces/orderUtils.interface";
 import { useInitUserOrders } from "utils/useInitUserOrders";
 import { setUserOrders } from "reducers/orderSlice";
+import IUser from "interfaces/user.interface";
+import OrderTable from "src/components/OrderTable";
+import UpdateUserForm from "src/components/UpdateUserForm";
 
-const ProfileScreen = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+interface IProps {
+  data: {
+    user: IUser;
+    orders: IOrder[];
+    token: string;
+  };
+}
 
+const ProfileScreen: FC<IProps> = ({ data: { orders, token, user } }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [message, setMessage] = useState<string | undefined>(undefined);
-  const { user } = useSelector((state: AppState) => state.auth);
-  const [getMyOrders, { isLoading: ordersLoading, error: ordersError }] =
-    useGetMyOrdersMutation();
 
-  const orders = useSelector((state: AppState) => state.order.userOrders);
+  // const [getMyOrders, { isLoading: ordersLoading, error: ordersError }] =
+  //   useGetMyOrdersMutation();
+
+  // const orders = useSelector((state: AppState) => state.order.userOrders);
 
   const [updateProfile, { isLoading, error, isSuccess, data: updatedUser }] =
     useUpdateUserProfileMutation();
@@ -54,37 +60,28 @@ const ProfileScreen = () => {
     }
   }, [updatedUser]);
 
-  // useEffect(() => {
-  //   console.log("user no");
-  //   if (user?.token) {
-  //     console.log("user yes");
+  // const submitHandler = (e: FormEvent) => {
+  //   e.preventDefault();
 
-  //     useInitUserOrders(user.token);
+  //   if (password !== confirmPassword) {
+  //     setMessage("Passwords Don't Match");
+  //   } else {
+  //     if (user && user.token) {
+  //       updateProfile({ name, email, password });
+  //     }
   //   }
-  // }, [user?.token]);
+  // };
 
-  const submitHandler = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setMessage("Passwords Don't Match");
-    } else {
-      if (user && user.token) {
-        updateProfile({ name, email, password });
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      setName(user.name as string);
-      setEmail(user.email as string);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     setName(user.name as string);
+  //     setEmail(user.email as string);
+  //   }
+  // }, [user]);
 
   return (
     <>
-      {user ? (
+      {user && orders && (
         <Container>
           <Row>
             <Col md={3}>
@@ -100,113 +97,14 @@ const ProfileScreen = () => {
               )}
 
               {isLoading && <Loader />}
-              <Form onSubmit={submitHandler}>
-                <Form.Group controlId="name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="name"
-                    placeholder="Enter your Name"
-                    value={name}
-                    required
-                    onChange={(e) => setName(e.target.value)}
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId="email">
-                  <Form.Label>Email Address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your Email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId="password">
-                  <Form.Label>Enter Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter your Password"
-                    onChange={(e) => setPassword(e.target.value)}
-                  ></Form.Control>
-                </Form.Group>
-                <Form.Group controlId="confirmPassword">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  ></Form.Control>
-                </Form.Group>
-
-                <Button type="submit" variant="primary" className="my-2">
-                  {" "}
-                  Update
-                </Button>
-              </Form>
+              <UpdateUserForm user={user} token={token} />
             </Col>
             <Col md={9}>
               <h2>My Order</h2>
-              {ordersLoading ? (
-                <Loader />
-              ) : ordersError ? (
-                <Message varient="danger">
-                  {(ordersError as RequestError).data.message}
-                </Message>
-              ) : (
-                <Table striped bordered hover responsive className="table-sm">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>DATE</th>
-                      <th>TOTAL</th>
-                      <th>PAID</th>
-                      <th>DELIVERED</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orders &&
-                      orders.map((order) => (
-                        <tr key={order?._id}>
-                          <td>{order?._id}</td>
-                          <td>{order?.createdAt?.substring(0, 10)}</td>
-                          <td>{order?.totalPrice}</td>
-                          <td>
-                            {order?.isPaid ? (
-                              moment(order?.paidAt).format("DD-MM-YYYY")
-                            ) : (
-                              <i
-                                className="fas fa-times"
-                                style={{ color: "red" }}
-                              ></i>
-                            )}
-                          </td>
-                          <td>
-                            {order?.isDelivered ? (
-                              order?.deliveredAt?.substring(0, 10)
-                            ) : (
-                              <i
-                                className="fas fa-times"
-                                style={{ color: "red" }}
-                              ></i>
-                            )}
-                          </td>
-                          <td>
-                            <Link href={`/orders/${order?._id}`}>
-                              <Button className="btn-sm" variant="light">
-                                Details
-                              </Button>
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </Table>
-              )}
+              <OrderTable orders={orders} />
             </Col>
           </Row>
         </Container>
-      ) : (
-        <Loader />
       )}
     </>
   );

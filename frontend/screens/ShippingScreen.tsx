@@ -10,19 +10,31 @@ import CheckoutSteps from "components/CheckoutSteps";
 import Loader from "components/Loader";
 import { IProduct } from "interfaces/products.interface";
 import { IShippingAddress } from "interfaces/orderUtils.interface";
+import { useSession } from "next-auth/react";
 
 const ShippingScreen: FC<{
   // shippingAddress: IShippingAddress | undefined;
   // cartItems: IProduct[] | undefined;
 }> = () => {
-  const { user } = useSelector((state: AppState) => state.auth);
+  const session = useSession();
   const dispatch = useDispatch();
   const router = useRouter();
+  const token = session.data?.accessToken as string;
+  const { shippingAddress } = useSelector((state: AppState) => state.cart);
 
   const [address, setAddress] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [postalCode, setPostalCode] = useState<string>("");
   const [country, setCountry] = useState<string>("");
+
+  useEffect(() => {
+    if (shippingAddress) {
+      setAddress(shippingAddress.address);
+      setCity(shippingAddress.city);
+      setPostalCode(shippingAddress.postalCode);
+      setCountry(shippingAddress.country);
+    }
+  }, [shippingAddress]);
 
   // useEffect(() => {
   //   if (!cartItems) {
@@ -48,7 +60,7 @@ const ShippingScreen: FC<{
 
   return (
     <>
-      {user ? (
+      {token ? (
         <FormContainer>
           <CheckoutSteps step1 step2 />
           <h1>Shipping</h1>

@@ -1,52 +1,50 @@
 import Link from "next/link";
-import { FormEvent, Fragment, useEffect, useRef } from "react";
+import { FormEvent, Fragment, useRef, useState } from "react";
 import { Button, Form, Row, Col } from "react-bootstrap";
 import FormContainer from "components/FormContainer";
 import { useRouter } from "next/router";
 import Message from "components/Message";
 import Loader from "components/Loader";
 import Head from "next/head";
-import { useLoginMutation, userApi } from "services/userApi";
-import RequestError from "interfaces/requestError.interface";
-import { useDispatch, useSelector } from "react-redux";
-import { setCredentials } from "reducers/authSlice";
-import { AppState } from "store";
+import { useSession, signIn, SignInResponse } from "next-auth/react";
 
 const Login = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const dispatch = useDispatch();
   const router = useRouter();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const session = useSession();
 
-  const [loginAction, { error, isLoading, isError }] = useLoginMutation({
-    fixedCacheKey: "login",
-  });
-
-  const { user } = useSelector((state: AppState) => state.auth);
-
-  const redirect = (
+  const redirectUrl = (
     router.query["redirect"] ? router.query["redirect"] : "/"
   ) as string;
 
-  if (user) {
-    router.push(`${redirect}`, undefined, { shallow: true });
+  if (session.data?.user) {
+    router.push(redirectUrl);
   }
 
   const submitHandler = async (e: FormEvent) => {
     e.preventDefault();
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
+
     if (email && password) {
-      const user = await loginAction({ email, password });
-      if ("data" in user) {
-        if ("token" in user.data) {
-          console.log("setting credentials");
-          localStorage.setItem("user", user.data.token as string);
+      setLoading(true);
+      signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: redirectUrl,
+        //@ts-ignore
+      }).then((res: SignInResponse) => {
+        if (res.ok) {
+          setLoading(false);
+        } else {
+          setError("Invalid email or password");
         }
-        dispatch(
-          setCredentials({ user: user.data, token: user.data.token as string })
-        );
-      }
+        setLoading(false);
+      });
     }
   };
 
@@ -57,12 +55,8 @@ const Login = () => {
       </Head>
       <FormContainer>
         <h1>Signin</h1>
-        {error && (
-          <Message varient="danger">
-            {(error as RequestError).data.message}
-          </Message>
-        )}
-        {isLoading && <Loader />}
+        {error && <Message varient="danger">{error}</Message>}
+        {loading && <Loader />}
         <Form onSubmit={submitHandler}>
           <Form.Group controlId="email">
             <Form.Label>Email Address</Form.Label>
@@ -91,7 +85,9 @@ const Login = () => {
             {" "}
             New Customer ?{" "}
             <Link
-              href={redirect ? `/register?redirect=${redirect}` : "/register"}
+              href={
+                redirectUrl ? `/register?redirect=${redirectUrl}` : "/register"
+              }
             >
               Register
             </Link>

@@ -14,6 +14,7 @@ const db_1 = require("./config/db");
 const product_router_1 = __importDefault(require("./routes/product.router"));
 const user_router_1 = __importDefault(require("./routes/user.router"));
 const upload_router_1 = __importDefault(require("./routes/upload.router"));
+const cart_router_1 = __importDefault(require("./routes/cart.router"));
 const error_middleware_1 = require("./middleware/error.middleware");
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
@@ -32,6 +33,7 @@ app.use("/api/products", product_router_1.default);
 app.use("/api/users", user_router_1.default);
 app.use("/api/orders", order_router_1.default);
 app.use("/api/upload", upload_router_1.default);
+app.use("/api/cart", cart_router_1.default);
 app.use("/images/", express_1.default.static(path_1.default.join(__dirname, "images")));
 if (process.env.NODE_ENV === "production") {
     app.use(express_1.default.static(path_1.default.join(__dirname, "../frontend/build")));

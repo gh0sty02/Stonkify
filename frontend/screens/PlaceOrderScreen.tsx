@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
 
 import CheckoutSteps from "components/CheckoutSteps";
 import Message from "components/Message";
@@ -19,17 +19,29 @@ import { IShippingAddress } from "interfaces/orderUtils.interface";
 import { useCreateOrderMutation } from "services/orderApi";
 import RequestError from "interfaces/requestError.interface";
 import { setOrder } from "reducers/orderSlice";
+import { useSession } from "next-auth/react";
+import { shippingAddressInit, cartInit } from "reducers/cartSlice";
 
 const PlaceOrderScreen = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  useEffect(() => {
+    const shippingAddress = localStorage.getItem("shippingAddress");
+    const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+    if (shippingAddress && cartItems.length > 0) {
+      dispatch(shippingAddressInit(JSON.parse(shippingAddress)));
+      dispatch(cartInit(cartItems));
+    }
+  }, []);
   const { cartItems, shippingAddress, paymentMethod } = useSelector(
     (state: AppState) => state.cart
   );
 
   const [createOrder, { isLoading, isError, error }] = useCreateOrderMutation();
 
-  const { user, token } = useSelector((state: AppState) => state.auth);
+  // const { user, token } = useSelector((state: AppState) => state.auth);
+  const session = useSession();
+  const token = session.data?.accessToken as string;
 
   // calculate price
   const addDecimals = (n: number) =>
@@ -56,7 +68,7 @@ const PlaceOrderScreen = () => {
 
   const cartProducts = cartItems.map((item) => {
     return {
-      productId: item._id as string,
+      productId: item.productId as string,
       qty: item.qty as number,
       price: item.price as number,
       name: item.name as string,
@@ -66,8 +78,8 @@ const PlaceOrderScreen = () => {
 
   const placeOrderHandler = async (e: FormEvent) => {
     e.preventDefault();
-    console.log(console.log(paymentMethod, user, token));
-    if (paymentMethod && user && token) {
+
+    if (paymentMethod && token) {
       const order = await createOrder({
         orderItems: cartProducts,
         shippingAddress: shippingAddress as IShippingAddress,
@@ -76,14 +88,14 @@ const PlaceOrderScreen = () => {
         shippingPrice,
         taxPrice,
         totalPrice,
-        token: token,
+        token,
         isPaid: false,
       });
 
-      console.log(order);
-
       if ("data" in order) {
+        console.log(order.data);
         dispatch(setOrder(order.data));
+        console.log(order.data);
         router.push(`/orders/${order.data._id}`);
       }
     }
@@ -128,7 +140,9 @@ const PlaceOrderScreen = () => {
                           />
                         </Col>
                         <Col>
-                          <Link href={`/product/${item._id}`}>{item.name}</Link>
+                          <Link href={`/product/${item.productId}`}>
+                            {item.name}
+                          </Link>
                         </Col>
                         <Col md={4}>
                           {item.qty} x ${item.price} = $

@@ -163,51 +163,61 @@ export const createProductReview = async (
   next: NextFunction
 ) => {
   try {
-    const { rating, comment }: { rating: number; comment: string } = req.body;
+    const session = await mongoose.startSession({
+      defaultTransactionOptions: {
+        writeConcern: { w: "majority" },
+        readConcern: { level: "majority" },
+      },
+    });
+    session.startTransaction();
+    try {
+      const { rating, comment }: { rating: string; comment: string } = req.body;
 
-    const product = await Product.findById(req.params.id);
-
-    if (product) {
-      const alreadyReviewed = product.reviews.find(
-        (r) => r.user.toString() === req.user?._id.toString()
+      const product = await Product.findById(req.params.id).session(session);
+      const curProduct = await Product.find({ _id: req.params.id }).session(
+        session
       );
+      console.log(curProduct);
 
-      if (alreadyReviewed) {
-        res.status(400);
-        throw new Error("Product already reviewed");
+      if (product) {
+        const alreadyReviewed = product.reviews.find(
+          (r) => r.user.toString() === req.user?._id.toString()
+        );
+        if (alreadyReviewed) {
+          res.status(400);
+          throw new Error("Product already reviewed");
+        }
       }
-    }
 
-    if (req.user && product) {
-      const review = {
-        name: req.user.name,
-        rating: Number(rating),
-        comment,
-        user: new mongoose.Types.ObjectId(req.user._id),
-        product: new mongoose.Types.ObjectId(product._id),
-      };
+      console.log(product);
+      if (req.user && product) {
+        const review = {
+          name: req.user.name,
+          rating: parseInt(rating),
+          comment,
+          user: new mongoose.Types.ObjectId(req.user._id),
+          product: new mongoose.Types.ObjectId(product._id),
+        };
+        console.log(review);
+        const createdReview = new Review(review, { session });
+        await createdReview.save({ session });
+        product.reviews.push(createdReview);
+        product.numReviews = product.reviews.length;
+        product.rating =
+          product?.reviews.reduce((acc, item) => item.rating + acc, 0) /
+          product?.reviews.length;
 
-      const createdReview = new Review(review);
+        await product.save({ session });
+        session.commitTransaction();
 
-      await createdReview.save();
-
-      product.reviews.push(createdReview);
-
-      product.numReviews = product.reviews.length;
-
-      product.rating =
-        product?.reviews.reduce((acc, item) => item.rating + acc, 0) /
-        product?.reviews.length;
-
-      await product.save();
-
-      return res
-        .status(201)
-        .json({ message: "Review Added", review: createdReview });
-    } else {
-      throw new Error(
-        "Something went wrong, Please Check if User is Logged in "
-      );
+        return res
+          .status(201)
+          .json({ message: "Review Added", review: createdReview });
+      } else {
+        throw new Error("Something went wrong, check if logged in");
+      }
+    } catch (error) {
+      throw new Error(error.message);
     }
   } catch (err) {
     next(err);

@@ -1,5 +1,6 @@
 import {
   addOrderItems,
+  deleteAllOrders,
   getMyOrders,
   getOrderById,
   getOrders,
@@ -17,5 +18,7 @@ router.route("/myorders").get(protect, getMyOrders);
 router.route("/:id").get(protect, getOrderById);
 router.route("/:id/pay").put(protect, updateOrderToPaid);
 router.route("/:id/deliver").put(protect, isAdmin, updateOrderToDelivered);
+
+router.route("/delete-all-orders").delete(protect, isAdmin, deleteAllOrders);
 
 export default router;

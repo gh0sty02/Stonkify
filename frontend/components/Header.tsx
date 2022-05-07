@@ -1,19 +1,27 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { memo, FC } from "react";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "reducers/authSlice";
-import { AppState } from "store";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import IUser from "interfaces/user.interface";
 import SearchBox from "./SearchBox";
+import { useDispatch, useSelector } from "react-redux";
+import { useResetUserStateData } from "utils/useResetUserStateData";
 
-const Header = () => {
-  const { user } = useSelector((state: AppState) => state.auth);
+const Header: FC<{
+  totalCartItems: number;
+  stateUser: Partial<IUser> | null;
+}> = ({ totalCartItems, stateUser }) => {
+  const { data } = useSession();
+  const sessionUser = data?.user as Partial<IUser>;
   const dispatch = useDispatch();
-  const router = useRouter();
+  const resetData = useResetUserStateData();
+  const user = stateUser ? stateUser : sessionUser;
 
   const logoutHandler = () => {
-    dispatch(logout());
-    router.push("/login");
+    resetData();
+    signOut({
+      callbackUrl: "/login",
+    });
   };
 
   return (
@@ -32,7 +40,8 @@ const Header = () => {
             <Nav className="ml-auto ">
               <Link href="/cart" passHref>
                 <Nav.Link>
-                  <i className="fas fa-shopping-cart"></i> Cart
+                  <i className="fas fa-shopping-cart"></i>
+                  Cart {`${totalCartItems > 0 ? `(${totalCartItems})` : ""}`}
                 </Nav.Link>
               </Link>
               {user ? (
@@ -73,4 +82,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default memo(Header);

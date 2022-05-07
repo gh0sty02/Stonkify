@@ -16,28 +16,10 @@ import { cartSlice } from "./reducers/cartSlice";
 import { orderSlice } from "./reducers/orderSlice";
 import { productDetailsSlice } from "./reducers/productDetailsSlice";
 import { productsListSlice } from "./reducers/productsListSlice";
-import { userSlice } from "./reducers/userInfoSlice";
 import { productsApi } from "services/productsApi";
-import {
-  persistReducer,
-  persistStore,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "reduxjs-toolkit-persist";
-import storage from "reduxjs-toolkit-persist/lib/storage";
-import autoMergeLevel1 from "reduxjs-toolkit-persist/lib/stateReconciler/autoMergeLevel1";
-
-import {
-  nextReduxCookieMiddleware,
-  wrapMakeStore,
-} from "next-redux-cookie-wrapper";
-import { RootState } from "@reduxjs/toolkit/dist/query/core/apiState";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { orderApi } from "services/orderApi";
+import { reviewApi } from "services/reviewApi";
 
 const reducers = combineReducers({
   productList: productsListSlice.reducer,
@@ -52,30 +34,20 @@ const reducers = combineReducers({
   [productsApi.reducerPath]: productsApi.reducer,
   [authSlice.name]: authSlice.reducer,
   [orderApi.reducerPath]: orderApi.reducer,
+  [reviewApi.reducerPath]: reviewApi.reducer,
 });
 
-const persistConfig = {
-  key: "root",
-  storage: storage,
-  stateReconciler: autoMergeLevel1,
-  whiteList: ["products", "user"],
-};
-// const _persistedReducer = persistReducer(persistConfig, reducers);
 export const makeStore = (
   options?: ConfigureStoreOptions["preloadedState"] | undefined
 ) =>
   configureStore({
-    // reducer: _persistedReducer,
     reducer: reducers,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-        },
-      }).concat(
+      getDefaultMiddleware().concat(
         userApi.middleware,
         productsApi.middleware,
-        orderApi.middleware
+        orderApi.middleware,
+        reviewApi.middleware
       ),
     ...options,
     devTools: process.env.NODE_ENV !== "production",
@@ -91,6 +63,5 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
-export const persistor = persistStore(store);
 export const useTypedSelector: TypedUseSelectorHook<AppState> = useSelector;
 export const wrapper = createWrapper<AppStore>(makeStore);

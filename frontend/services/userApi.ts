@@ -6,14 +6,15 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { ILoginFormData, IUserData } from "interfaces/formdata.interface";
 import IUser from "interfaces/user.interface";
+import { HYDRATE } from "next-redux-wrapper";
 import { authSlice } from "reducers/authSlice";
+import { REHYDRATE } from "redux-persist";
 
 import { AppState } from "store";
 
 export const userApi = createApi({
   reducerPath: "user",
   tagTypes: ["user"],
-  keepUnusedDataFor: 60,
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.BACKEND_URL}/api/users`,
 
@@ -26,6 +27,11 @@ export const userApi = createApi({
       return headers;
     },
   }),
+  extractRehydrationInfo(action, { reducerPath }) {
+    if (action.type === REHYDRATE) {
+      return action.payload[reducerPath];
+    }
+  },
 
   endpoints: (builder) => ({
     login: builder.mutation<Partial<IUser>, ILoginFormData>({
@@ -79,12 +85,16 @@ export const userApi = createApi({
         },
       }),
     }),
-    getAllUsers: builder.query<IUser[], null>({
-      query: () => `/`,
-      providesTags: ["user"],
-    }),
-    getUserById: builder.query<IUser, { id: string }>({
-      query: ({ id }) => `/${id}`,
+
+    getUserById: builder.query<IUser, { id: string; token: string }>({
+      query: ({ id, token }) => ({
+        url: `/${id}`,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }),
     }),
     updateUserProfile: builder.mutation<Partial<IUser>, IUserData>({
       query: ({ ...body }) => ({
@@ -98,13 +108,17 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["user"],
     }),
-    updateUser: builder.mutation<IUser, { id: string; body: IUserData }>({
-      query: ({ id, body }) => ({
+    updateUser: builder.mutation<
+      IUser,
+      { id: string; body: Partial<IUserData>; token: string }
+    >({
+      query: ({ id, body, token }) => ({
         url: `/${id}`,
         method: "PUT",
         body,
         headers: {
           "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
         },
       }),
       invalidatesTags: ["user"],
@@ -119,15 +133,27 @@ export const userApi = createApi({
       }),
     }),
 
-    tokenLogin: builder.mutation<Partial<IUser>, { token: string }>({
-      query: ({ token }) => ({
-        url: "tokenLogin",
-        method: "POST",
+    tokenLogin: builder.mutation<Partial<IUser>, string>({
+      query: (token) => {
+        return {
+          url: "tokenlogin",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        };
+      },
+    }),
+    getAllUsers: builder.query<IUser[], string>({
+      query: (token) => ({
+        url: `/`,
         headers: {
           "Content-Type": "application/json",
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       }),
+      providesTags: ["user"],
     }),
   }),
 });
@@ -142,4 +168,8 @@ export const {
   useUpdateUserMutation,
   useUpdateUserProfileMutation,
   useTokenLoginMutation,
+
+  util: { getRunningOperationPromises },
 } = userApi;
+
+export const { tokenLogin, getAllUsers, getUserById } = userApi.endpoints;

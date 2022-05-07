@@ -9,7 +9,7 @@ import { getAllProducts } from "reducers/asyncActions/productActions";
 import { userInit } from "reducers/userInfoSlice";
 import ProductListScreen from "screens/ProductListScreen";
 import { AppState } from "store";
-import { initData } from "utils/initData";
+import { initData } from "utils/initDataOld";
 import { resetUpdateProductSucces } from "reducers/adminProductSlice";
 // import { setCreateProductSuccessFalse } from "reducers/createProductSlice";
 // import { setDeleteSuccessFalse } from "reducers/deleteProductSlice";

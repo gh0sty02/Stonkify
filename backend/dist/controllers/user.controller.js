@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.deleteUser = exports.getUser = exports.getUsers = exports.updateUserProfile = exports.getUserProfile = exports.registerUser = exports.authUser = void 0;
+exports.tokenLogin = exports.updateUser = exports.deleteUser = exports.getUser = exports.getUsers = exports.updateUserProfile = exports.getUserProfile = exports.registerUser = exports.authUser = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const generateToken_1 = __importDefault(require("../utils/generateToken"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -194,4 +195,27 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.updateUser = updateUser;
+const tokenLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d;
+    try {
+        const token = (_d = req.headers.authorization) === null || _d === void 0 ? void 0 : _d.split(" ")[1];
+        if (!token) {
+            throw new Error("No token provided");
+        }
+        const decode = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        const user = (yield user_model_1.default.findById(decode.id)
+            .select("_id email name isAdmin")
+            .select("-password "));
+        if (user) {
+            return res.json(user);
+        }
+        else {
+            throw new Error("User Not found");
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.tokenLogin = tokenLogin;
 //# sourceMappingURL=user.controller.js.map

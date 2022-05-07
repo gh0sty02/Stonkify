@@ -4,40 +4,51 @@ import HomeScreen from "screens/HomeScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { Container } from "react-bootstrap";
 
-import { getTopRatedProducts } from "reducers/asyncActions/productActions";
-import { userInit } from "reducers/userInfoSlice";
-import { cartInit, shippingAddressInit } from "reducers/cartSlice";
-import { AppState, makeStore, wrapper } from "store";
-import { initData } from "utils/initData";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import Loader from "src/components/Loader";
-import { resetOrders } from "reducers/orderSlice";
+
 import {
   useGetAllProductsQuery,
   useGetTopRatedProductsQuery,
-  getAllProducts,
-  getRunningOperationPromises,
 } from "services/productsApi";
-import { IProduct } from "interfaces/products.interface";
 
-const Home: NextPage<{
-  products: IProduct[];
-  topRatedProducts: IProduct[];
-}> = ({ products, topRatedProducts }) => {
+import { tokenLogin, useTokenLoginMutation } from "services/userApi";
+import { useSession } from "next-auth/react";
+
+const Home: NextPage<{}> = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const pageNumber = Number(router.query.pageNumber) || 1;
   const keyword = (router.query.keyword as string) || "";
-  const { isLoading, isError, data } = useGetAllProductsQuery({
+  const [tokenLogin] = useTokenLoginMutation();
+  const {
+    isLoading,
+    isError,
+    data: productsData,
+  } = useGetAllProductsQuery({
     pageNumber,
     keyword,
   });
+  const session = useSession();
+  console.log(session);
 
-  useEffect(() => {
-    dispatch(getTopRatedProducts());
-    dispatch(resetOrders());
-  }, []);
+  const { data: topProductsData, isLoading: loadingTopProducts } =
+    useGetTopRatedProductsQuery();
+
+  // useEffect(() => {
+  //   if (token) {
+  //     tokenLogin({ token });
+  //   }
+  // }, [token]);
+  // if (token) {
+  //   useTokenLogin(token);
+  // }
+
+  // useEffect(() => {
+  //   dispatch(getTopRatedProducts());
+  //   dispatch(resetOrders());
+  // }, []);
 
   return (
     <>
@@ -57,10 +68,10 @@ const Home: NextPage<{
           {isLoading && <Loader />}
           {isLoading && !isError && <p>Loading...</p>}
 
-          {data?.products && !isLoading && (
+          {productsData?.products && topProductsData && !isLoading && (
             <HomeScreen
-              products={data.products}
-              topRatedProducts={topRatedProducts}
+              products={productsData.products}
+              topRatedProducts={topProductsData}
               keyword={keyword}
             />
           )}
@@ -69,47 +80,5 @@ const Home: NextPage<{
     </>
   );
 };
-
-export const getServerSideProps = wrapper.getServerSideProps<{
-  products: {
-    products: IProduct[];
-    page: number;
-    pages: number;
-  } | null;
-  topRatedProducts: IProduct[] | null;
-}>((store) => async ({ params }) => {
-  const store = makeStore();
-
-  const data = await (
-    await store.dispatch(
-      getAllProducts.initiate({ pageNumber: 1, keyword: "" })
-    )
-  ).data;
-
-  if (data) {
-    await Promise.all(getRunningOperationPromises());
-
-    let productsArray: IProduct[] = [];
-    Object.values(data.products).forEach((product) => {
-      productsArray.push(product);
-    });
-
-    productsArray.sort((a, b) => b.rating - a.rating);
-
-    return {
-      props: {
-        products: data,
-        topRatedProducts: productsArray.slice(0, 3),
-      },
-    };
-  } else {
-    return {
-      props: {
-        products: null,
-        topRatedProducts: null,
-      },
-    };
-  }
-});
 
 export default memo(Home);

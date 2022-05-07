@@ -1,17 +1,18 @@
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { Button, Form, Row, Col } from "react-bootstrap";
 import FormContainer from "components/FormContainer";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-
-import { register } from "reducers/asyncActions/userActions";
-import { AppState } from "store";
+import { AppState, wrapper } from "store";
 import Message from "components/Message";
 import Loader from "components/Loader";
 import { useRegisterMutation } from "services/userApi";
 import { setCredentials } from "reducers/authSlice";
 import RequestError from "interfaces/requestError.interface";
+import { useCookies } from "react-cookie";
+import cookie from "cookie";
+import { signIn, useSession } from "next-auth/react";
 
 const Register = () => {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -23,14 +24,12 @@ const Register = () => {
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [register, { isLoading, isError, error }] = useRegisterMutation();
   const user = useSelector((state: AppState) => state.auth.user);
+  const [cookie, setCookie] = useCookies();
+  const session = useSession();
 
-  const redirect = (
+  const redirectUrl = (
     router.query["redirect"] ? router.query["redirect"] : "/"
   ) as string;
-
-  if (user) {
-    router.push(`${redirect}`, undefined, { shallow: true });
-  }
 
   const submitHandler = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,19 +43,21 @@ const Register = () => {
       setMessage("Passwords Don't Match");
     } else {
       if (email && password && name) {
-        const user = await register({ email, password, name });
-        if ("data" in user) {
-          dispatch(
-            setCredentials({
-              user: user.data,
-              token: user.data.token as string,
-            })
-          );
-
-          if ("token" in user.data) {
-            localStorage.setItem("user", user.data.token as string);
+        register({ email, password, name }).then((data) => {
+          if ("data" in data) {
+            dispatch(
+              setCredentials({
+                user: data.data,
+                token: data.data.token as string,
+              })
+            );
+            signIn("credentials", {
+              email,
+              password,
+              callbackUrl: redirectUrl,
+            });
           }
-        }
+        });
       }
     }
   };
@@ -118,7 +119,9 @@ const Register = () => {
         <Col>
           {" "}
           Existing Customer ?{" "}
-          <Link href={redirect ? `/login?redirect=${redirect}` : "/login"}>
+          <Link
+            href={redirectUrl ? `/login?redirect=${redirectUrl}` : "/login"}
+          >
             login
           </Link>
         </Col>

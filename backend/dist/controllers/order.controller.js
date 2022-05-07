@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOrders = exports.updateOrderToDelivered = exports.updateOrderToPaid = exports.getMyOrders = exports.getOrderById = exports.addOrderItems = void 0;
 const order_model_1 = __importDefault(require("../models/order.model"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const user_model_1 = __importDefault(require("../models/user.model"));
 const addOrderItems = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -23,19 +25,36 @@ const addOrderItems = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             throw new Error("No order Items");
         }
         else {
-            const order = new order_model_1.default({
-                orderItems,
-                user: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id,
-                shippingAddress,
-                paymentMethod,
-                itemsPrice,
-                taxPrice,
-                shippingPrice,
-                totalPrice,
+            const session = yield mongoose_1.default.startSession({
+                defaultTransactionOptions: {
+                    writeConcern: { w: "majority" },
+                    readConcern: { level: "majority" },
+                },
             });
-            order.populate("user", "name email");
-            const createdOrder = yield order.save();
-            res.status(201).json(createdOrder);
+            session.startTransaction();
+            try {
+                const order = yield new order_model_1.default({
+                    orderItems,
+                    user: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id,
+                    shippingAddress,
+                    paymentMethod,
+                    itemsPrice,
+                    taxPrice,
+                    shippingPrice,
+                    totalPrice,
+                }, session);
+                const createdOrder = yield order.save({ session });
+                const user = yield user_model_1.default.findById(order.user).session(session);
+                yield (user === null || user === void 0 ? void 0 : user.orders.push(createdOrder._id));
+                yield (user === null || user === void 0 ? void 0 : user.save({ session }));
+                yield order.populate("user", "name email");
+                yield session.commitTransaction();
+                res.status(201).json(order);
+            }
+            catch (error) {
+                session.abortTransaction();
+                throw error;
+            }
         }
     }
     catch (err) {

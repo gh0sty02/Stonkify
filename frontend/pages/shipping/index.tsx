@@ -1,6 +1,7 @@
+import { IShippingAddress } from "interfaces/orderUtils.interface";
 import Head from "next/head";
 import router from "next/router";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { cartInit, shippingAddressInit } from "reducers/cartSlice";
@@ -8,31 +9,21 @@ import { userInit } from "reducers/userInfoSlice";
 import ShippingScreen from "screens/ShippingScreen";
 import { useLoginMutation } from "services/userApi";
 import { AppState } from "store";
-import { initData } from "utils/initData";
+import { initData } from "utils/initDataOld";
 
 const Shipping = () => {
   const dispatch = useDispatch();
+  const [shippingAddress, setShippingAddress] =
+    useState<IShippingAddress | null>(null);
 
-  const [_, { isLoading, isError }] = useLoginMutation();
-  const { user } = useSelector((state: AppState) => state.auth);
-
-  // const { cartItems, shippingAddress } = initData();
-
-  // useEffect(() => {
-  //   if (user) {
-  //     dispatch(userInit(user));
-  //   } else {
-  //     router.push("/login");
-  //     return;
-  //   }
-
-  //   if (cartItems) {
-  //     dispatch(cartInit(cartItems));
-  //   }
-  //   if (shippingAddress) {
-  //     dispatch(shippingAddressInit(shippingAddress));
-  //   }
-  // }, [user, cartItems, shippingAddress]);
+  useEffect(() => {
+    const shippingAddress = localStorage.getItem("shippingAddress");
+    const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
+    if (shippingAddress && cartItems.length > 0) {
+      dispatch(shippingAddressInit(JSON.parse(shippingAddress)));
+      dispatch(cartInit(cartItems));
+    }
+  }, []);
 
   return (
     <Fragment>
@@ -40,10 +31,7 @@ const Shipping = () => {
         <title>Stonkify | Shipping Details</title>
       </Head>
       <div>
-        <ShippingScreen
-        // cartItems={cartItems}
-        // shippingAddress={shippingAddress}
-        />
+        <ShippingScreen />
       </div>
     </Fragment>
   );
