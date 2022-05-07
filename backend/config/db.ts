@@ -3,7 +3,6 @@ import colors from "colors";
 import dotenv from "dotenv";
 
 dotenv.config({ path: "../.env" });
-
 export const connectDB = async () => {
   try {
     // creating a connection to the database
