@@ -20,7 +20,7 @@ import { useRouter } from "next/router";
 import Loader from "components/Loader";
 import Message from "components/Message";
 // import { addToCart } from "reducers/asyncActions/cartActions";
-import { createReview } from "reducers/asyncActions/reviewActions";
+
 import { useGetProductQuery } from "services/productsApi";
 import { IProduct } from "interfaces/products.interface";
 import RequestError from "interfaces/requestError.interface";
@@ -55,13 +55,13 @@ const ProductScreen: FC<{
   const session = useSession();
   const token = session.data?.accessToken as string;
 
-  const { error: reviewError, success: reviewSuccess } = state.productReview;
+  // const { error: reviewError, success: reviewSuccess } = state.productReview;
 
-  useEffect(() => {
-    if (reviewSuccess) {
-      setReviewStatus(true);
-    }
-  }, [reviewSuccess]);
+  // useEffect(() => {
+  //   if (reviewSuccess) {
+  //     setReviewStatus(true);
+  //   }
+  // }, [reviewSuccess]);
 
   const addToCartHandler = async () => {
     if (!token) {
@@ -225,9 +225,9 @@ const ProductScreen: FC<{
                         ))}
                         <ListGroup.Item>
                           <h2>Write a Customer Review</h2>
-                          {reviewError && (
+                          {/* {reviewError && (
                             <Message varient="danger">{reviewError}</Message>
-                          )}
+                          )} */}
                           {token ? (
                             <Form onSubmit={addReviewHandler}>
                               <Form.Group controlId="rating">

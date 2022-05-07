@@ -1,12 +1,13 @@
-import Link from "next/link";
 import { FormEvent, Fragment, useRef, useState } from "react";
+import Link from "next/link";
+import Head from "next/head";
 import { Button, Form, Row, Col } from "react-bootstrap";
-import FormContainer from "components/FormContainer";
+import { useSession, signIn, SignInResponse } from "next-auth/react";
 import { useRouter } from "next/router";
+
+import FormContainer from "components/FormContainer";
 import Message from "components/Message";
 import Loader from "components/Loader";
-import Head from "next/head";
-import { useSession, signIn, SignInResponse } from "next-auth/react";
 
 const Login = () => {
   const emailRef = useRef<HTMLInputElement>(null);

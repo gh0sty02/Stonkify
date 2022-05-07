@@ -6,30 +6,21 @@ import {
   ThunkAction,
 } from "@reduxjs/toolkit";
 import { createWrapper } from "next-redux-wrapper";
-import { adminOrderSlice } from "reducers/adminOrderSlice";
-import { adminProductSlice } from "reducers/adminProductSlice";
-import { adminUserSlice } from "reducers/adminUserSlice";
 import { authSlice } from "reducers/authSlice";
-import productReviewSlice from "reducers/productReviewSlice";
+
 import { userApi } from "services/userApi";
 import { cartSlice } from "./reducers/cartSlice";
 import { orderSlice } from "./reducers/orderSlice";
-import { productDetailsSlice } from "./reducers/productDetailsSlice";
-import { productsListSlice } from "./reducers/productsListSlice";
+
 import { productsApi } from "services/productsApi";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { orderApi } from "services/orderApi";
 import { reviewApi } from "services/reviewApi";
 
 const reducers = combineReducers({
-  productList: productsListSlice.reducer,
-  productDetails: productDetailsSlice.reducer,
   cart: cartSlice.reducer,
   order: orderSlice.reducer,
-  productReview: productReviewSlice.reducer,
-  adminUserSlice: adminUserSlice.reducer,
-  adminProductEdit: adminProductSlice.reducer,
-  adminOrderSlice: adminOrderSlice.reducer,
+
   [userApi.reducerPath]: userApi.reducer,
   [productsApi.reducerPath]: productsApi.reducer,
   [authSlice.name]: authSlice.reducer,

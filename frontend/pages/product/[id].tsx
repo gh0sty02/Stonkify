@@ -1,61 +1,28 @@
 import { IProduct } from "interfaces/products.interface";
-import {
-  GetStaticPathsContext,
-  GetStaticProps,
-  GetStaticPropsContext,
-} from "next";
-import { getSession, useSession } from "next-auth/react";
+import { GetStaticProps, GetStaticPropsContext } from "next";
+import { useSession } from "next-auth/react";
 import { FC, useEffect } from "react";
-import { Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getProductDetails } from "reducers/asyncActions/productActions";
-import { cartInit, shippingAddressInit } from "reducers/cartSlice";
-import { clearReviews } from "reducers/productReviewSlice";
-import { userInit } from "reducers/userInfoSlice";
 import ProductScreen from "screens/ProductScreen";
 import {
   getAllProducts,
   getProduct,
   getRunningOperationPromises,
-  productsApi,
   useGetProductQuery,
 } from "services/productsApi";
-import { useUpdateUserMutation } from "services/userApi";
 import Loader from "src/components/Loader";
 import { AppState, makeStore, wrapper } from "store";
-import { initData } from "utils/initDataOld";
 
 const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
   id,
   product,
 }) => {
-  const dispatch = useDispatch();
   const session = useSession();
   console.log(session);
   const token = session.data?.accessToken as string;
 
   const { isLoading, isError, data } = useGetProductQuery(id);
-
-  useEffect(() => {
-    if (!product) {
-      dispatch(getProductDetails(id));
-    }
-  }, []);
-
-  const { review, loading, success } = useSelector(
-    (state: AppState) => state.productReview
-  );
-
-  // const { user, cartItems, shippingAddress } = initData();
-
-  // useEffect(() => {
-  //   if (success) {
-  //     alert("Review Submitted Successfully");
-  //     dispatch(clearReviews());
-  //     // dispatch(getProductDetails(id));
-  //   }
-  // }, [success]);
 
   return (
     <>
@@ -64,20 +31,6 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
     </>
   );
 };
-
-// export const getServerSideProps = wrapper.getServerSideProps(
-//   (store) =>
-//     async ({ params }) => {
-//       const id = params?.id as string;
-//       store.dispatch(getProduct.initiate(id));
-//       await Promise.all(getRunningOperationPromises());
-//       return {
-//         props: {
-//           id,
-//         },
-//       };
-//     }
-// );
 
 export const getStaticPaths = async () => {
   const store = makeStore();

@@ -10,9 +10,9 @@ import { getMyOrders, useGetMyOrdersMutation } from "services/orderApi";
 import cookie from "cookie";
 import { AppState, wrapper } from "store";
 import { getSession } from "next-auth/react";
-import { userInit } from "reducers/userInfoSlice";
 import IUser from "interfaces/user.interface";
 import { tokenLogin } from "services/userApi";
+import { userInit } from "reducers/authSlice";
 
 const Profile: FC<{ user: IUser; token: string; orders: IOrder[] }> = ({
   user,
@@ -20,24 +20,6 @@ const Profile: FC<{ user: IUser; token: string; orders: IOrder[] }> = ({
   orders,
 }) => {
   const dispatch = useDispatch();
-  const router = useRouter();
-  // const { user, token } = useSelector((state: AppState) => state.auth);
-  const [getMyOrders, { isLoading: ordersLoading, error: ordersError }] =
-    useGetMyOrdersMutation();
-
-  // const useInitUserOrders = async (token: string) => {
-  //   const orders = await getMyOrders({ token });
-
-  //   if ("data" in orders) {
-  //     dispatch(setUserOrders(orders.data as IOrder[]));
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (token) {
-  //     useInitUserOrders(token);
-  //   }
-  // }, [token]);
 
   useEffect(() => {
     dispatch(userInit(user));

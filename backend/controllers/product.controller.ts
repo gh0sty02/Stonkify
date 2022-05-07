@@ -12,7 +12,7 @@ export const getProducts = async (
   next: NextFunction
 ) => {
   try {
-    const pageSize = 10;
+    const pageSize = 8;
     const page = Number(req.query.pageNumber) || 1;
 
     const keyword = req.query.keyword
@@ -91,6 +91,7 @@ export const createProduct = async (
   next: NextFunction
 ) => {
   try {
+    // creating a default product, which can be edited on the frontend
     const newProduct = new Product({
       name: "Sample Name",
       user: req.user?._id,
@@ -130,6 +131,7 @@ export const updateProduct = async (
 
     const product = await Product.findById(req.params.id);
 
+    // updating the product, if found
     if (product) {
       product.name = name;
       product.user = new mongoose.Types.ObjectId(req.user?._id);
@@ -141,6 +143,7 @@ export const updateProduct = async (
       product.countInStock = countInStock;
     }
 
+    // creating a new product, if existing product not found
     const createdProduct = await product?.save();
 
     if (!createdProduct) {
@@ -177,20 +180,21 @@ export const createProductReview = async (
       const curProduct = await Product.find({ _id: req.params.id }).session(
         session
       );
-      console.log(curProduct);
 
       if (product) {
+        // check if the user has already reviewed the product
         const alreadyReviewed = product.reviews.find(
           (r) => r.user.toString() === req.user?._id.toString()
         );
+
         if (alreadyReviewed) {
           res.status(400);
           throw new Error("Product already reviewed");
         }
       }
 
-      console.log(product);
       if (req.user && product) {
+        // create a new reviewq
         const review = {
           name: req.user.name,
           rating: parseInt(rating),
@@ -198,11 +202,15 @@ export const createProductReview = async (
           user: new mongoose.Types.ObjectId(req.user._id),
           product: new mongoose.Types.ObjectId(product._id),
         };
-        console.log(review);
+
         const createdReview = new Review(review, { session });
         await createdReview.save({ session });
+
+        // pushing the new review to the product's reviews
         product.reviews.push(createdReview);
         product.numReviews = product.reviews.length;
+
+        // calculating the average rating using total reviews and total ratings
         product.rating =
           product?.reviews.reduce((acc, item) => item.rating + acc, 0) /
           product?.reviews.length;

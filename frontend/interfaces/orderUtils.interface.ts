@@ -1,5 +1,6 @@
 import { IProduct } from "interfaces/products.interface";
 import { ICartItem, ICartItemDetails } from "./cart.interface";
+import IUser from "./user.interface";
 
 export interface IShippingAddress {
   address: string;
@@ -7,10 +8,6 @@ export interface IShippingAddress {
   postalCode: string;
   country: string;
 }
-
-// export interface cartProduct extends IProduct {
-//   qty: number;
-// }
 
 export type cartType = {
   cartItems: ICartItemDetails[];
@@ -38,6 +35,7 @@ export interface IOrder {
     postalCode: string;
     country: string;
   };
+  user: Partial<IUser>;
 
   paymentMethod: string;
 

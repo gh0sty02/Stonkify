@@ -1,64 +1,24 @@
+import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {
-  Col,
-  Container,
-  ListGroup,
-  Row,
-  Form,
-  Button,
-  Card,
-  Alert,
-} from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { Col, Container, ListGroup, Row, Button, Card } from "react-bootstrap";
+import { useSession } from "next-auth/react";
 
+import { AppState } from "store";
 import CartItem from "components/CartItem";
 import Message from "components/Message";
-import { addToCart } from "reducers/asyncActions/cartActions";
-import { cartInit, changeQty, removeFromCart } from "reducers/cartSlice";
-
-import { AppState, wrapper } from "store";
-import {
-  useAddToCartMutation,
-  useChangeQtyMutation,
-  useGetAllCartItemsMutation,
-  useRemoveFromCartMutation,
-} from "services/cartApi";
-import { FC, useEffect, useState } from "react";
-import { ICartItem } from "interfaces/cart.interface";
+import { changeQty, removeFromCart } from "reducers/cartSlice";
+import { useGetAllCartItemsMutation } from "services/cartApi";
 import Loader from "src/components/Loader";
-import { useSession } from "next-auth/react";
 
 const CartScreen = () => {
   const router = useRouter();
   const session = useSession();
   const dispatch = useDispatch();
-
   const [loading, setLoading] = useState(false);
   const { cartItems } = useSelector((state: AppState) => state.cart);
-  const [getAllCartItems] = useGetAllCartItemsMutation();
-  // const [changeQty] = useChangeQtyMutation();
-  // const [removeFromCart] = useRemoveFromCartMutation();
-  const token = session.data?.accessToken as string;
-
-  // useEffect(() => {
-  //   if (token) {
-  //     setLoading(true);
-  //     getCartItems(token).then((data) => {
-  //       dispatch(cartInit(data));
-  //     });
-  //     setLoading(false);
-  //   }
-  // }, [token]);
-
-  const getCartItems = async (token: string) => {
-    const res = await getAllCartItems(token);
-    if ("data" in res) {
-      return res.data;
-    }
-    return [];
-  };
 
   const dispatchChangeQty = async (productId: string, qty: number) => {
     dispatch(changeQty({ productId, qty }));
@@ -69,10 +29,6 @@ const CartScreen = () => {
   };
 
   const removeFromCartHandler = async (productId: string) => {
-    // const result = await removeFromCart({ cartItemId: id, token });
-    // if ("data" in result) {
-    //   dispatch(cartInit(result.data));
-    // }
     dispatch(removeFromCart(productId));
   };
   return (
@@ -89,9 +45,11 @@ const CartScreen = () => {
               <ListGroup variant="flush">
                 {cartItems.map((item) => (
                   <CartItem
-                    item={item}
-                    onRemoveFromCardHandler={removeFromCartHandler}
-                    onChangeQty={dispatchChangeQty}
+                    data={{
+                      item: item,
+                      onRemoveFromCardHandler: removeFromCartHandler,
+                      onChangeQty: dispatchChangeQty,
+                    }}
                     key={item.productId}
                   />
                 ))}

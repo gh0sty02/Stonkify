@@ -4,11 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import Loader from "components/Loader";
 import Message from "components/Message";
-import { deleteUser } from "reducers/asyncActions/userActions";
-import { AppState } from "store";
-import { setUserSuccessFalse } from "reducers/adminUserSlice";
+
 import { FC } from "react";
-import { useGetAllUsersQuery } from "services/userApi";
+import { useDeleteUserMutation, useGetAllUsersQuery } from "services/userApi";
 import IUser from "interfaces/user.interface";
 import RequestError from "interfaces/requestError.interface";
 
@@ -24,10 +22,7 @@ const UserListScreen: FC<IProps> = ({ data: { users, token, user } }) => {
   const dispatch = useDispatch();
   const { isLoading, isError, error, data, refetch } =
     useGetAllUsersQuery(token);
-  // const { users, loading, error } = useSelector(
-  //   (state: AppState) => state.adminUserSlice
-  // );
-  // const { user: currentUser } = useSelector((state: AppState) => state.user);
+  const [deleteUser] = useDeleteUserMutation();
 
   type data = {
     id: string;
@@ -36,11 +31,7 @@ const UserListScreen: FC<IProps> = ({ data: { users, token, user } }) => {
 
   const deleteHandler = (data: data) => {
     if (window.confirm("Are You Sure ?")) {
-      dispatch(deleteUser({ id: data.id, token: data.token }));
-
-      setTimeout(() => {
-        dispatch(setUserSuccessFalse());
-      }, 1500);
+      deleteUser({ id: data.id, token: data.token });
     }
   };
   return (

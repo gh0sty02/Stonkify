@@ -18,7 +18,9 @@ frontend/.env
 backend/.dist/
 backend/.env/
 backend/node_modules/
+backend/seeder.ts
 /todos.txt
+.env
 
 
 

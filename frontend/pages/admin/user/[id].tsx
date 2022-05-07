@@ -1,12 +1,13 @@
 import { FC, Fragment } from "react";
 import Head from "next/head";
-
 import { getSession } from "next-auth/react";
 import { Container } from "react-bootstrap";
+
 import IUser from "interfaces/user.interface";
-import UserEditScreen from "screens/UserEditScreen";
+
 import { makeStore, wrapper } from "store";
 import { getUserById } from "services/userApi";
+import UserEditScreen from "screens/UserEditScreen";
 
 const UserEdit: FC<{ user: IUser; token: string; id: string }> = ({
   user,
@@ -47,9 +48,9 @@ export const getServerSideProps = wrapper.getServerSideProps(
 
     return {
       redirect: {
-        pathname: "/",
-        query: {
-          error: "You are not authorized to view this page",
+        redirect: {
+          destination: "/",
+          permanent: false,
         },
       },
     };

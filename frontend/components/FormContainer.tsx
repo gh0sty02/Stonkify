@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, ReactNode } from "react";
+import { FC, ReactNode } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 
 interface Props {

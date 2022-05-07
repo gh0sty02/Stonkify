@@ -1,11 +1,12 @@
-import IUser from "interfaces/user.interface";
-import email from "next-auth/providers/email";
 import React, { FC, FormEvent, useEffect, useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { useDispatch } from "react-redux";
+
+import IUser from "interfaces/user.interface";
+
+import { reloadSession } from "utils/reloadSession";
 import { setCredentials } from "reducers/authSlice";
 import { useUpdateUserProfileMutation } from "services/userApi";
-import { reloadSession } from "utils/reloadSession";
 
 const UpdateUserForm: FC<{ user: IUser; token: string }> = ({
   user,
@@ -18,8 +19,7 @@ const UpdateUserForm: FC<{ user: IUser; token: string }> = ({
   const dispatch = useDispatch();
 
   const [message, setMessage] = useState<string | undefined>(undefined);
-  const [updateProfile, { isLoading, error, isSuccess, data: updatedUser }] =
-    useUpdateUserProfileMutation();
+  const [updateProfile] = useUpdateUserProfileMutation();
 
   const submitHandler = async (e: FormEvent) => {
     e.preventDefault();

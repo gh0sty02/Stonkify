@@ -1,6 +1,5 @@
 import {
   addItemToCart,
-  cartInitAfterLogin,
   changeQty,
   emptyCart,
   getAllCartItems,
@@ -20,7 +19,5 @@ router
   .route("/:id")
   .put(protect, changeQty)
   .delete(protect, removeItemFromCart);
-
-router.route("/init").post(protect, cartInitAfterLogin);
 
 export default router;

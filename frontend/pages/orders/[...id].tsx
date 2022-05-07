@@ -9,7 +9,6 @@ import IUser from "interfaces/user.interface";
 import OrderScreen from "screens/OrderScreen";
 
 import { wrapper } from "store";
-
 import { orderInit, resetOrders } from "reducers/orderSlice";
 import { changePaymentStatus, getOrder } from "services/orderApi";
 import { tokenLogin } from "services/userApi";

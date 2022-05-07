@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { FC } from "react";
+import Link from "next/link";
 import { Nav } from "react-bootstrap";
 
 const CheckoutSteps: FC<{

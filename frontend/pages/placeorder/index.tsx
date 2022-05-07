@@ -4,15 +4,8 @@ import { Fragment, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  cartInit,
-  paymentMethodInit,
-  shippingAddressInit,
-} from "reducers/cartSlice";
-import { userInit } from "reducers/userInfoSlice";
 import PlaceOrderScreen from "screens/PlaceOrderScreen";
 import { AppState, wrapper } from "store";
-import { initData } from "utils/initDataOld";
 
 const PlaceOrder = () => {
   const dispatch = useDispatch();

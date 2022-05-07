@@ -19,9 +19,10 @@ import { useSession } from "next-auth/react";
 const Home: NextPage<{}> = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const pageNumber = Number(router.query.pageNumber) || 1;
+  const pageNumber = Number(router.query.page) || 1;
   const keyword = (router.query.keyword as string) || "";
   const [tokenLogin] = useTokenLoginMutation();
+
   const {
     isLoading,
     isError,
@@ -73,6 +74,8 @@ const Home: NextPage<{}> = () => {
               products={productsData.products}
               topRatedProducts={topProductsData}
               keyword={keyword}
+              page={productsData.page}
+              pages={productsData.pages}
             />
           )}
         </Container>

@@ -1,14 +1,8 @@
-import { IProduct } from "interfaces/products.interface";
-import RequestError from "interfaces/requestError.interface";
 import Link from "next/link";
 import { FC } from "react";
 import { Carousel, Image } from "react-bootstrap";
-import { useSelector } from "react-redux";
-import { useGetTopRatedProductsQuery } from "services/productsApi";
 
-import { AppState } from "store";
-import Loader from "./Loader";
-import Message from "./Message";
+import { IProduct } from "interfaces/products.interface";
 
 const ProductsCarousel: FC<{ topProducts: IProduct[] }> = ({ topProducts }) => {
   return (
@@ -24,7 +18,7 @@ const ProductsCarousel: FC<{ topProducts: IProduct[] }> = ({ topProducts }) => {
                   alt={product.name}
                 />
                 <Carousel.Caption className="carousel-caption">
-                  <h2>
+                  <h2 style={{ textOverflow: "ellipsis" }}>
                     {product.name} (${product.price})
                   </h2>
                 </Carousel.Caption>

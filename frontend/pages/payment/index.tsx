@@ -1,12 +1,9 @@
 import Head from "next/head";
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import { useDispatch } from "react-redux";
 
-import { cartInit, shippingAddressInit } from "reducers/cartSlice";
-import { userInit } from "reducers/userInfoSlice";
 import PaymentScreen from "screens/PaymentMethodScreen";
 import { wrapper } from "store";
-import { initData } from "utils/initDataOld";
 
 const PaymentMethod = () => {
   // const { user, cartItems, shippingAddress, paymentMethod } = initData();

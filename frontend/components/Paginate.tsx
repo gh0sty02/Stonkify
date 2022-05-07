@@ -16,8 +16,8 @@ const Paginate: FC<{
           href={
             !isAdmin
               ? keyword
-                ? `/search/${keyword}/page/${x + 1}`
-                : `/page/${x + 1}`
+                ? `/search/query=${keyword}&page=${x + 1}`
+                : `/?page=${x + 1}`
               : `/admin/productList/${x + 1}`
           }
           passHref

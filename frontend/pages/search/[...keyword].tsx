@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 import { FC, Fragment, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { useGetAllProductsQuery } from "services/productsApi";
 
-import { getAllProducts } from "reducers/asyncActions/productActions";
 import ListProducts from "src/components/ListProducts";
 import Loader from "src/components/Loader";
 import Paginate from "src/components/Paginate";
@@ -15,16 +15,18 @@ import { AppState } from "store";
 
 const Products: FC<{ keyword: string; page: number }> = ({ keyword, page }) => {
   const dispatch = useDispatch();
+  const { data, isLoading, isError } = useGetAllProductsQuery({
+    pageNumber: page,
+    keyword,
+  });
+  const products = data?.products;
+  const pages = data?.pages;
 
-  const { products, pages, loading } = useSelector(
-    (state: AppState) => state.productList
-  );
-
-  useEffect(() => {
-    if (keyword) {
-      dispatch(getAllProducts({ keyword, pageNumber: page }));
-    }
-  }, [keyword, page]);
+  // useEffect(() => {
+  //   if (keyword) {
+  //     dispatch(getAllProducts({ keyword, pageNumber: page }));
+  //   }
+  // }, [keyword, page]);
   return (
     <Fragment>
       <Head>
@@ -32,13 +34,15 @@ const Products: FC<{ keyword: string; page: number }> = ({ keyword, page }) => {
       </Head>
       <Container>
         <h1>Products</h1>
-        {loading && <Loader />}
+        {isLoading && <Loader />}
         <Link href="/" passHref>
           <a className="btn btn-light">Go Back</a>
         </Link>
 
-        <ListProducts products={products} loading={loading} />
-        <Paginate pages={pages} page={page} keyword={keyword}></Paginate>
+        {products && <ListProducts products={products} loading={isLoading} />}
+        {pages && (
+          <Paginate pages={pages} page={page} keyword={keyword}></Paginate>
+        )}
       </Container>
     </Fragment>
   );
@@ -46,12 +50,15 @@ const Products: FC<{ keyword: string; page: number }> = ({ keyword, page }) => {
 
 export const getServerSideProps = (context: GetServerSidePropsContext) => {
   if (context.params?.keyword) {
-    const keyword = context.params.keyword[0];
-    const page = Number(context.params.keyword[2]);
+    const params = context.params.keyword as string[];
+    const query = params[0].split("&");
+    const keywords = query.map((keyword) => keyword.split("=")).flat();
+    const searchQuery = keywords[1];
+    const page = keywords[3];
 
     return {
       props: {
-        keyword,
+        keyword: searchQuery,
         page,
       },
     };

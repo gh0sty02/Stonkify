@@ -4,6 +4,9 @@ import { ICartItem } from "../Interfaces/cart.interface";
 import CartItem from "../models/cartItem.model";
 import User from "../models/user.model";
 
+// @desc   Add item to cart
+// @route  POST /api/cart/
+// @access  Private
 export const addItemToCart = async (
   req: Request,
   res: Response,
@@ -12,18 +15,19 @@ export const addItemToCart = async (
   try {
     const { price, qty, productId, image, name }: ICartItem = req.body;
 
+    // creating a session to begin a transaction
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
       const cartItem = await CartItem.find({ productId });
       if (cartItem.length > 0) {
-        console.log(cartItem);
+        // if a duplicate cart item is found, update the quantity
         await CartItem.updateOne({ productId }, { $inc: { qty: qty } });
 
         await session.commitTransaction();
         return res.status(200).json(cartItem);
       } else {
-        console.log("new");
+        // create a new cart item
         const newCartItem = new CartItem(
           {
             productId,
@@ -35,14 +39,14 @@ export const addItemToCart = async (
           { session }
         );
         await newCartItem.save({ session });
-
         const user = await User.findById(req.user?._id).session(session);
+
+        // push the new cart item to the user's cart
         await user?.cartItems.push(
           newCartItem._id as mongoose.Schema.Types.ObjectId
         );
         await user?.save({ session });
 
-        // await cartItem.populate("user", "name email");
         const cartItems = await CartItem.find({ user: req.user?._id });
         session.commitTransaction();
 
@@ -57,6 +61,9 @@ export const addItemToCart = async (
   }
 };
 
+// @desc   remove item from cart
+// @route  Delete /api/cart/:id
+// @access  Private
 export const removeItemFromCart = async (
   req: Request,
   res: Response,
@@ -70,13 +77,15 @@ export const removeItemFromCart = async (
       const cartItem = await CartItem.findById(id).session(session);
       const user = await User.findById(req.user?._id).session(session);
 
+      // deleting the cart item
       await cartItem?.remove({ session });
-      //   await user?.cartItems.remove(
-      //     cartItem._id as mongoose.Schema.Types.ObjectId
-      //   );
+
+      //finding the index of cart item in user's cart to remove it, if it exists
       const index = user?.cartItems.indexOf(
         cartItem?._id as mongoose.Schema.Types.ObjectId
       );
+
+      // if cartItems exists, remove it
       if (index && index > -1) {
         user?.cartItems.splice(index, 1);
       }
@@ -94,6 +103,9 @@ export const removeItemFromCart = async (
   }
 };
 
+// @desc   Empty cart
+// @route  DELETE /api/cart/
+// @access  Private
 export const emptyCart = async (
   req: Request,
   res: Response,
@@ -104,8 +116,12 @@ export const emptyCart = async (
     session.startTransaction();
     try {
       const user = await User.findById(req.user?._id).session(session);
+
+      // deleting all cart items
       await CartItem.deleteMany({ user: user?._id }, { session });
+      // setting user's cart to empty
       user?.cartItems.splice(0, user?.cartItems.length);
+
       await user?.save({ session });
       session.commitTransaction();
       res.status(200).json({ message: "Cart emptied" });
@@ -118,6 +134,9 @@ export const emptyCart = async (
   }
 };
 
+// @desc   Get All user cart items
+// @route  Get /api/cart/
+// @access  Private
 export const getAllCartItems = async (
   req: Request,
   res: Response,
@@ -131,26 +150,9 @@ export const getAllCartItems = async (
   }
 };
 
-export const cartInitAfterLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    console.log(req.body.cartItems);
-    const user = await User.findById(req.user?._id);
-    const cartItems = user?.cartItems;
-
-    //@todo
-    // check for each Cartitem in req.body and if it is in user.cartItem, then increment the qty, if not create a new
-    // cartItem document and push it to user.cartItems and return cartItems
-
-    return res.json(cartItems);
-  } catch (error) {
-    next(error);
-  }
-};
-
+// @desc   Change cart item quantity
+// @route  POST /api/cart/:id
+// @access  Private
 export const changeQty = async (
   req: Request,
   res: Response,

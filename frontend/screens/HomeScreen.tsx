@@ -4,26 +4,18 @@ import { Col, Row } from "react-bootstrap";
 import { IProduct } from "interfaces/products.interface";
 import Product from "components/Product";
 import Paginate from "src/components/Paginate";
-import { useSelector } from "react-redux";
-import { AppState } from "store";
 import ProductsCarousel from "src/components/ProductsCarousel";
-import RequestError from "interfaces/requestError.interface";
-import {
-  getTopRatedProducts,
-  useGetTopRatedProductsQuery,
-} from "services/productsApi";
 
 const HomeScreen: FC<{
   products: IProduct[];
   topRatedProducts: IProduct[];
   keyword: string;
-}> = ({ products, keyword, topRatedProducts }) => {
-  const { page, pages } = useSelector((state: AppState) => state.productList);
-
+  pages: number;
+  page: number;
+}> = ({ products, keyword, topRatedProducts, pages, page }) => {
   return (
     <>
       {!keyword && <ProductsCarousel topProducts={topRatedProducts} />}
-
       <h1 className="mt-3">Latest Products</h1>
       <Row>
         {products.map((prod: IProduct) => (

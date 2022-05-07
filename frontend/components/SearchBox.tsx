@@ -1,6 +1,6 @@
-import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { useRouter } from "next/router";
 
 const SearchBox = () => {
   const [keyword, setKeyword] = useState(" ");
@@ -10,7 +10,7 @@ const SearchBox = () => {
     e.preventDefault();
 
     if (keyword.trim()) {
-      router.push(`/search/${keyword}/page/1`);
+      router.push(`/search/query=${keyword}&page=1`);
     } else {
       router.push("/");
     }

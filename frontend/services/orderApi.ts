@@ -26,9 +26,6 @@ export const orderApi = createApi({
   }),
 
   endpoints: (builder) => ({
-    getAllOrders: builder.query<IOrder[], null>({
-      query: () => `/`,
-    }),
     getOrder: builder.mutation<IOrder, { orderId: string; token: string }>({
       query: (data) => ({
         url: `/${data.orderId}`,
@@ -101,6 +98,16 @@ export const orderApi = createApi({
         },
       }),
     }),
+    getAllOrders: builder.query<IOrder[], string>({
+      query: (token) => ({
+        url: "/",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
   }),
 });
 
@@ -111,6 +118,7 @@ export const {
   useGetOrderMutation,
   useCreateOrderMutation,
   useChangeDeliveryStatusMutation,
+
   util: { getRunningOperationPromises },
 } = orderApi;
 

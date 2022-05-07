@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-const colors = require("colors");
+import colors from "colors";
 import { users } from "./data/users";
 import { products } from "./data/products";
 import User from "./models/user.model";
@@ -12,15 +12,15 @@ dotenv.config();
 
 connectDB();
 
-const importData = async () => {
+const constData = async () => {
   try {
-    await Order.deleteMany();
+    // await Order.deleteMany();
     await Product.deleteMany();
-    await User.deleteMany();
+    // await User.deleteMany();
 
-    const createdUsers = await User.insertMany(users);
+    // await User.insertMany(users);
 
-    const adminUser = createdUsers[0]._id;
+    const adminUser = "61e66dc73fa663d53330c01b";
 
     const sampleProducts = products.map((p) => {
       return {
@@ -28,10 +28,13 @@ const importData = async () => {
         user: adminUser,
       };
     });
+    sampleProducts.map(async (product) => {
+      await Product.collection.insertOne(product);
+    });
 
-    await Product.insertMany(sampleProducts);
+    console.log("done");
 
-    console.log("data imported".green.inverse);
+    // await Product.insertMany(products).console.log("data consted");
   } catch (error) {
     console.log(error.message);
   }
@@ -39,11 +42,11 @@ const importData = async () => {
 
 const deleteData = async () => {
   try {
-    await Order.deleteMany();
-    await Product.deleteMany();
-    await User.deleteMany();
+    // await Order.deleteMany();
+    // await Product.deleteMany();
+    // await User.deleteMany();
 
-    console.log("data deleted".red.inverse);
+    console.log("data deleted");
   } catch (error) {
     console.log(error.message);
   }
@@ -52,5 +55,6 @@ const deleteData = async () => {
 if (process.argv[2] === "-d") {
   deleteData();
 } else {
-  importData();
+  console.log("executing");
+  constData();
 }

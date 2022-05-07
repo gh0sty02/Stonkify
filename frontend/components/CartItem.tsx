@@ -1,13 +1,20 @@
-import { ICartItem, ICartItemDetails } from "interfaces/cart.interface";
-import Link from "next/link";
 import { FC } from "react";
+import Link from "next/link";
 import { ListGroup, Row, Col, Form, Button, Image } from "react-bootstrap";
 
-const CartItem: FC<{
-  item: ICartItemDetails;
-  onRemoveFromCardHandler: (id: string) => void;
-  onChangeQty: (id: string, qty: number) => void;
-}> = ({ item, onRemoveFromCardHandler, onChangeQty }) => {
+import { ICartItemDetails } from "interfaces/cart.interface";
+
+interface IProps {
+  data: {
+    item: ICartItemDetails;
+    onRemoveFromCardHandler: (id: string) => void;
+    onChangeQty: (id: string, qty: number) => void;
+  };
+}
+
+const CartItem: FC<IProps> = ({
+  data: { item, onRemoveFromCardHandler, onChangeQty },
+}) => {
   return (
     <ListGroup.Item key={item.productId}>
       <Row>

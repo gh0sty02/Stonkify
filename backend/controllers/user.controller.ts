@@ -14,7 +14,6 @@ export const authUser = async (
 ) => {
   try {
     const { email, password }: { email: string; password: string } = req.body;
-
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -23,7 +22,6 @@ export const authUser = async (
     }
 
     const userToken = generateToken(user?._id);
-
     const isPasswordCorrect = await user.matchPassword(password);
 
     if (user && isPasswordCorrect) {
@@ -58,6 +56,7 @@ export const registerUser = async (
   }: { name: string; email: string; password: string } = req.body;
 
   try {
+    // Check if user already exists
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -65,15 +64,18 @@ export const registerUser = async (
       throw new Error("User already exists");
     }
 
+    // Create new user
     const user = await User.create({
       name,
       email,
       password,
     });
 
+    // Generate token
     const userToken = generateToken(user._id);
 
     if (user) {
+      // Return user and set the auth header
       return res.status(201).setHeader("X-auth-token", userToken).json({
         _id: user._id,
         name: user.name,
@@ -138,7 +140,6 @@ export const updateUserProfile = async (
       }
 
       const updatedUser = await user.save();
-
       const token = req.headers.authorization?.split(" ")[1];
 
       return res.status(200).json({
@@ -248,18 +249,23 @@ export const updateUser = async (
   }
 };
 
+// @desc   use token to log in user
+// @route  POST api/users/tokenlogin
+// @access  Private
 export const tokenLogin = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    // Get token from header
     const token = req.headers.authorization?.split(" ")[1] as string;
 
     if (!token) {
       throw new Error("No token provided");
     }
 
+    // Verify token
     const decode: any = jwt.verify(token, process.env.JWT_SECRET as string);
 
     const user = (await User.findById(decode.id)

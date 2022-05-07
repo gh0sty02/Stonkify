@@ -26,9 +26,7 @@ export const productsApi = createApi({
       { keyword: string; pageNumber: number }
     >({
       query: ({ keyword, pageNumber }) =>
-        keyword && pageNumber
-          ? `?keyword=${keyword}&pageNumber=${pageNumber}`
-          : `/`,
+        `?keyword=${keyword}&pageNumber=${pageNumber}`,
     }),
     getProduct: builder.query<IProduct, string>({
       query: (id) => `/${id}`,
@@ -36,6 +34,32 @@ export const productsApi = createApi({
     getTopRatedProducts: builder.query<IProduct[], void>({
       query: () => `/top`,
     }),
+    updateProduct: builder.mutation<
+      IProduct,
+      { productId: string; token: string; product: Partial<IProduct> }
+    >({
+      query: (data) => ({
+        url: `${data.productId}`,
+        method: "PUT",
+        body: data.product,
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${data.token}`,
+        },
+      }),
+    }),
+    deleteProduct: builder.mutation<null, { productId: string; token: string }>(
+      {
+        query: (data) => ({
+          url: `${data.productId}`,
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${data.token}`,
+          },
+        }),
+      }
+    ),
   }),
 });
 
@@ -43,6 +67,8 @@ export const {
   useGetAllProductsQuery,
   useGetProductQuery,
   useGetTopRatedProductsQuery,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
   util: { getRunningOperationPromises },
 } = productsApi;
 

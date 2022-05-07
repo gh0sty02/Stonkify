@@ -1,13 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import { IOrder } from "interfaces/orderUtils.interface";
-import {
-  createOrder,
-  getMyOrders,
-  getOrderDetails,
-  payOrder,
-} from "./asyncActions/orderActions";
-
 type orderType = {
   currentOrder: IOrder | null;
   userOrders: IOrder[] | null;

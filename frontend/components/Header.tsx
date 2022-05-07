@@ -7,13 +7,16 @@ import SearchBox from "./SearchBox";
 import { useDispatch, useSelector } from "react-redux";
 import { useResetUserStateData } from "utils/useResetUserStateData";
 
-const Header: FC<{
-  totalCartItems: number;
-  stateUser: Partial<IUser> | null;
-}> = ({ totalCartItems, stateUser }) => {
+interface IProps {
+  data: {
+    totalCartItems: number;
+    stateUser: Partial<IUser> | null;
+  };
+}
+
+const Header: FC<IProps> = ({ data: { totalCartItems, stateUser } }) => {
   const { data } = useSession();
   const sessionUser = data?.user as Partial<IUser>;
-  const dispatch = useDispatch();
   const resetData = useResetUserStateData();
   const user = stateUser ? stateUser : sessionUser;
 

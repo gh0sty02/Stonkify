@@ -1,35 +1,19 @@
-import IUser from "interfaces/user.interface";
-import { getSession, useSession } from "next-auth/react";
+import { FC, Fragment } from "react";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { FC, Fragment, useEffect } from "react";
+import { getSession } from "next-auth/react";
 import { Container } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
 
-import { getUsers } from "reducers/asyncActions/userActions";
-import { userInit } from "reducers/userInfoSlice";
-import UserListScreen from "screens/UserListScreen";
+import IUser from "interfaces/user.interface";
+
+import { wrapper } from "store";
 import { getAllUsers } from "services/userApi";
-import { AppState, wrapper } from "store";
+import UserListScreen from "screens/UserListScreen";
 
 const UserList: FC<{ users: IUser[]; user: Partial<IUser>; token: string }> = ({
   users,
   token,
   user,
 }) => {
-  const dispatch = useDispatch();
-  const router = useRouter();
-
-  const { success } = useSelector((state: AppState) => state.adminUserSlice);
-
-  // const session = useSession();
-  // const user = session.data?.user;
-
-  // useEffect(() => {
-  //   if (success && user?.isAdmin && user?.token) {
-  //     dispatch(getUsers(user.token));
-  //   }
-  // }, [success]);
   return (
     <Fragment>
       <Head>
@@ -64,10 +48,8 @@ export const getServerSideProps = wrapper.getServerSideProps(
 
     return {
       redirect: {
-        pathname: "/",
-        query: {
-          error: "You are not authorized to view this page",
-        },
+        destination: "/",
+        permanent: false,
       },
     };
   }

@@ -1,8 +1,9 @@
-import { IOrder } from "interfaces/orderUtils.interface";
-import moment from "moment";
 import Link from "next/link";
 import React, { FC } from "react";
 import { Table, Button } from "react-bootstrap";
+import moment from "moment";
+
+import { IOrder } from "interfaces/orderUtils.interface";
 
 const OrderTable: FC<{ orders: IOrder[] }> = ({ orders }) => {
   return (
