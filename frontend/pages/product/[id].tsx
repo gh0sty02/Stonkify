@@ -52,12 +52,12 @@ export const getStaticPaths = async () => {
 
     return {
       paths,
-      fallback: false,
+      fallback: true,
     };
   } else {
     return {
       paths: [],
-      fallback: false,
+      fallback: true,
     };
   }
 };

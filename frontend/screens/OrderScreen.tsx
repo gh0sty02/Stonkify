@@ -1,5 +1,4 @@
 import { FC, FormEvent, useState } from "react";
-import axios from "axios";
 import {
   ListGroup,
   Row,
@@ -14,15 +13,12 @@ import Link from "next/link";
 import moment from "moment";
 import { useRouter } from "next/router";
 //@ts-ignore
-import { loadStripe } from "@stripe/stripe-js";
 import Message from "components/Message";
 import { IOrder } from "interfaces/orderUtils.interface";
-import { deliverOrder } from "reducers/asyncActions/orderActions";
 import IUser from "interfaces/user.interface";
-import Stripe from "stripe";
 import getStripe from "utils/getStripe";
 import { fetchPostJSON } from "utils/apiHelper";
-import { getOrder, useChangeDeliveryStatusMutation } from "services/orderApi";
+import { useChangeDeliveryStatusMutation } from "services/orderApi";
 import { orderInit } from "reducers/orderSlice";
 import { AppState } from "store";
 
