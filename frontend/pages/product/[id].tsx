@@ -16,7 +16,7 @@ import {
 import Loader from "src/components/Loader";
 import { AppState, makeStore, wrapper } from "store";
 
-const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
+const ProductDetails: FC<{ id: string; product: IProduct }> = ({
   id,
   product,
 }) => {
@@ -25,13 +25,13 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
   const router = useRouter();
   const token = session.data?.accessToken as string;
 
-  const { isLoading, isError, data } = useGetProductQuery(id);
+  // const { isLoading, isError, data } = useGetProductQuery(id);
 
   return (
     <>
-      {isLoading && <Loader />}
+      {/* {isLoading && <Loader />} */}
       {router.isFallback && <Loader />}
-      {data && <ProductScreen id={id} currentProduct={data} />}
+      {product && <ProductScreen id={id} currentProduct={product} />}
     </>
   );
 };
@@ -65,17 +65,29 @@ export const getStaticProps: GetStaticProps = wrapper.getStaticProps<{
   if (id) {
     // const data = (await store.dispatch(getProduct.initiate(id)))
     //   .data as IProduct;
-    const data = await store.dispatch(getProduct.initiate(id));
-    await Promise.all(getRunningOperationPromises());
-    if ("data" in data) {
-      return {
-        props: {
-          id,
-          product: data.data,
-          revalidate: 600,
-        },
-      };
-    }
+    // const data = await store.dispatch(getProduct.initiate(id));
+    // await Promise.all(getRunningOperationPromises());
+    // if ("data" in data) {
+    //   return {
+    //     props: {
+    //       id,
+    //       product: data.data,
+    //       revalidate: 600,
+    //     },
+    //   };
+    // }
+
+    const { data }: { data: IProduct } = await axios.get(
+      `${process.env.BACKEND_URL}/api/products/${id}`
+    );
+
+    return {
+      props: {
+        id,
+        product: data,
+        revalidate: 600,
+      },
+    };
   }
 });
 
