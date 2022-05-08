@@ -1,8 +1,8 @@
 {
   "..\\node_modules\\next\\dist\\client\\index.js -> ../pages/_error": {
-    "id": 9894,
+    "id": "..\\node_modules\\next\\dist\\client\\index.js -> ../pages/_error",
     "files": [
-      "static/chunks/894.9047cda612e8fce0.js"
+      "static/chunks/node_modules_next_dist_pages__error_js.js"
     ]
   }
 }

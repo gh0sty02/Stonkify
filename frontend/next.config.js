@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/api/:path*",
+  //       destination: "https://stonkifyapp.herokuapp.com*",
+  //     },
+  //   ];
+  // },
   reactStrictMode: true,
   env: {
     BACKEND_URL: process.env.BACKEND_URL,
