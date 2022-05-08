@@ -28,8 +28,8 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
 
   return (
     <>
-      {isLoading  && <Loader />}
-      {(router.isFallback  && <Loader />}
+      {isLoading && <Loader />}
+      {router.isFallback && <Loader />}
       {data && <ProductScreen id={id} currentProduct={data} />}
     </>
   );
