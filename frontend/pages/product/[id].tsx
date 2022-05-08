@@ -25,8 +25,6 @@ const ProductDetails: FC<{ id: string; product: IProduct }> = ({
   const router = useRouter();
   const token = session.data?.accessToken as string;
 
-  // const { isLoading, isError, data } = useGetProductQuery(id);
-
   return (
     <>
       {/* {isLoading && <Loader />} */}
