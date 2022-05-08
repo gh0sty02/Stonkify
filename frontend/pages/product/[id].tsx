@@ -28,7 +28,8 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
 
   return (
     <>
-      {isLoading || (router.isFallback && <Loader />)}
+      {isLoading  && <Loader />}
+      {(router.isFallback  && <Loader />}
       {data && <ProductScreen id={id} currentProduct={data} />}
     </>
   );
@@ -52,13 +53,10 @@ export const getStaticPaths = async () => {
 
     return {
       paths,
-      fallback: "blocking",
+      fallback: false,
     };
   } else {
-    return {
-      paths: [],
-      fallback: "blocking",
-    };
+    console.error("Something went wrong");
   }
 };
 
@@ -79,7 +77,7 @@ export const getStaticProps: GetStaticProps = wrapper.getStaticProps<{
         props: {
           id,
           product: data.data,
-          revalidate: 10,
+          revalidate: 600,
         },
       };
     }
