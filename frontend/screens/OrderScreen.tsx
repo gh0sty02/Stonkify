@@ -41,7 +41,6 @@ const OrderScreen: FC<IProps> = ({ user, token }) => {
   const { currentOrder: order } = useSelector((state: AppState) => state.order);
 
   const deliverProductHandler = async () => {
-    console.log(token);
     if (user?.isAdmin && token && order && order._id && !order.isDelivered) {
       const data = await changeDeliveryStatus({
         orderId: order._id,
@@ -63,8 +62,6 @@ const OrderScreen: FC<IProps> = ({ user, token }) => {
 
       // create checkout session
       const stripe = await getStripe();
-
-      console.log(response);
 
       const { error } = await stripe!.redirectToCheckout({
         // passing the sessionId of the strip payment to get the payment session

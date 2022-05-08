@@ -1,6 +1,7 @@
 import { IProduct } from "interfaces/products.interface";
 import { GetStaticProps, GetStaticPropsContext } from "next";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { FC, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -19,14 +20,15 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
   product,
 }) => {
   const session = useSession();
-  console.log(session);
+
+  const router = useRouter();
   const token = session.data?.accessToken as string;
 
   const { isLoading, isError, data } = useGetProductQuery(id);
 
   return (
     <>
-      {isLoading && <Loader />}
+      {isLoading || (router.isFallback && <Loader />)}
       {data && <ProductScreen id={id} currentProduct={data} />}
     </>
   );

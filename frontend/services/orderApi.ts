@@ -39,7 +39,6 @@ export const orderApi = createApi({
       { orderId: string; token: string }
     >({
       query: (data) => {
-        console.log(data);
         return {
           url: `/${data.orderId}/pay`,
           method: "PUT",
@@ -65,7 +64,6 @@ export const orderApi = createApi({
     }),
     createOrder: builder.mutation<IOrder, IOrderDetails>({
       query: (orderDetails) => {
-        console.log(orderDetails);
         return {
           url: "",
           method: "POST",

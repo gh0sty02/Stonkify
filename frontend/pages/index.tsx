@@ -32,24 +32,8 @@ const Home: NextPage<{}> = () => {
     keyword,
   });
   const session = useSession();
-  console.log(session);
-
   const { data: topProductsData, isLoading: loadingTopProducts } =
     useGetTopRatedProductsQuery();
-
-  // useEffect(() => {
-  //   if (token) {
-  //     tokenLogin({ token });
-  //   }
-  // }, [token]);
-  // if (token) {
-  //   useTokenLogin(token);
-  // }
-
-  // useEffect(() => {
-  //   dispatch(getTopRatedProducts());
-  //   dispatch(resetOrders());
-  // }, []);
 
   return (
     <>

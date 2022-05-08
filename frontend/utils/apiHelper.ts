@@ -10,7 +10,7 @@ export async function fetchGetJSON(url: string) {
 export async function fetchPostJSON(url: string, data?: {}) {
   try {
     // Default options are marked with *
-    console.log(data);
+
     const response = await fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       mode: "cors", // no-cors, *cors, same-origin

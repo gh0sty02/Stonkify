@@ -23,14 +23,11 @@ const UpdateUserForm: FC<{ user: IUser; token: string }> = ({
 
   const submitHandler = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("click");
-    console.log(user);
 
     if (password !== confirmPassword) {
       setMessage("Passwords Don't Match");
     } else {
       if (user && token) {
-        console.log("updating");
         const data = await updateProfile({ name, email, password, token });
         if ("data" in data) {
           reloadSession();

@@ -34,8 +34,6 @@ export const getServerSideProps = wrapper.getServerSideProps(
     const users = await store.dispatch(getAllUsers.initiate(token));
     const user = session?.user;
 
-    // console.log(users);
-
     if ("data" in users) {
       return {
         props: {

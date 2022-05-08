@@ -48,7 +48,6 @@ export const getServerSideProps = wrapper.getServerSideProps(
 
     if (token && session_id) {
       if (session_id) {
-        console.log("yes");
         const data = await store.dispatch(
           changePaymentStatus.initiate({ orderId: id, token })
         );

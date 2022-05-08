@@ -7,8 +7,7 @@ export const initUser = (incomingCookie: string | undefined) => {
     if (cookieData.user) {
       cookieData["user"] = JSON.parse(cookieData["user"]);
     }
-    console.log(incomingCookie);
-    console.log(cookieData);
+
     const token = cookieData.user;
     if (token) {
       return token;

@@ -7,6 +7,5 @@ const getStripe = () => {
   }
   return stripePromise;
 };
-console.log(getStripe());
 
 export default getStripe;

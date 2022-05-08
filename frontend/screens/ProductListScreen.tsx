@@ -35,7 +35,6 @@ const ProductListScreen: FC<IProps> = ({
     if (token && isAdmin) {
       const data = await deleteProduct({ productId: productId, token: token });
       if ("data" in data) {
-        console.log("refetching");
         refetch();
       }
     }

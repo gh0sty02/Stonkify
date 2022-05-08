@@ -35,7 +35,7 @@ export interface IOrder {
     postalCode: string;
     country: string;
   };
-  user: Partial<IUser>;
+  user?: Partial<IUser>;
 
   paymentMethod: string;
 

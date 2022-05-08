@@ -82,7 +82,6 @@ const ProductScreen: FC<{
     e.preventDefault();
 
     if (token && product?._id) {
-      console.log(rating);
       const reviewData = await createReview({
         review: { rating, comment, token, productId: product._id },
         productId: product._id,

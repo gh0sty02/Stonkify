@@ -22,7 +22,7 @@ const Cart: FC<{ token: string; cartItems: ICartItem[] }> = () => {
   }, []);
 
   const { cartItems } = useSelector((state: AppState) => state.cart);
-  console.log(cartItems);
+
   return (
     <div>
       <Head>

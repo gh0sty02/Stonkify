@@ -77,7 +77,6 @@ export const cartSlice = createSlice({
     },
 
     removeFromCart: (state, { payload }: PayloadAction<string>) => {
-      console.log(payload);
       state.cartItems = state.cartItems.filter((i) => i.productId !== payload);
 
       if (typeof window !== undefined) {

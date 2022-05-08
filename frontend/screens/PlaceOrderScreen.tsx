@@ -93,9 +93,8 @@ const PlaceOrderScreen = () => {
       });
 
       if ("data" in order) {
-        console.log(order.data);
         dispatch(setOrder(order.data));
-        console.log(order.data);
+
         router.push(`/orders/${order.data._id}`);
       }
     }
