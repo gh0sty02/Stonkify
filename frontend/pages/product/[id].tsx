@@ -1,3 +1,4 @@
+import axios from "axios";
 import { IProduct } from "interfaces/products.interface";
 import { GetStaticProps, GetStaticPropsContext } from "next";
 import { useSession } from "next-auth/react";
@@ -35,29 +36,21 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
   );
 };
 
-export const getStaticPaths = async () => {
-  const store = makeStore();
+export const getStaticPaths = async (context: GetStaticPropsContext) => {
+  const {
+    data,
+  }: { data: { products: IProduct[]; pages: number; page: number } } =
+    await axios.get(`${process.env.BACKEND_URL}/api/products`);
+  const paths = data.products.map((product) => ({
+    params: {
+      id: product._id,
+    },
+  }));
 
-  const result = await store.dispatch(
-    getAllProducts.initiate({ pageNumber: 1, keyword: "" })
-  );
-
-  await Promise.all(getRunningOperationPromises());
-
-  if ("data" in result) {
-    const paths = result.data?.products.map((product) => ({
-      params: {
-        id: product._id,
-      },
-    }));
-
-    return {
-      paths,
-      fallback: false,
-    };
-  } else {
-    console.error("Something went wrong");
-  }
+  return {
+    paths,
+    fallback: false,
+  };
 };
 
 export const getStaticProps: GetStaticProps = wrapper.getStaticProps<{
