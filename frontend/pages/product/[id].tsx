@@ -38,14 +38,14 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
 export const getStaticPaths = async () => {
   const store = makeStore();
 
-  const result = await (
-    await store.dispatch(
-      getAllProducts.initiate({ pageNumber: 1, keyword: "" })
-    )
-  ).data;
+  const result = await store.dispatch(
+    getAllProducts.initiate({ pageNumber: 1, keyword: "" })
+  );
 
-  if (result) {
-    const paths = result.products.map((product) => ({
+  await Promise.all(getRunningOperationPromises());
+
+  if ("data" in result) {
+    const paths = result.data?.products.map((product) => ({
       params: {
         id: product._id,
       },
