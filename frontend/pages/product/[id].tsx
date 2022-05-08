@@ -21,7 +21,6 @@ const ProductDetails: FC<{ id: string; product: IProduct | null }> = ({
   product,
 }) => {
   const session = useSession();
-  console.log(product);
 
   const router = useRouter();
   const token = session.data?.accessToken as string;
