@@ -45,8 +45,6 @@ export const getStaticPaths = async (context: GetStaticPropsContext) => {
     },
   }));
 
-  console.log(paths);
-
   return {
     paths,
     fallback: "blocking",
