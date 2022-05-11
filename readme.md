@@ -121,6 +121,7 @@ Make Sure that you have [Node.js](https://nodejs.org/en/) and Latest NPM Version
    ```
 4. CD to Frontend Folder and install Dependencies
    ```sh
+   cd frontend
    npm install
    ```
 5. CD to main folder and start the server
