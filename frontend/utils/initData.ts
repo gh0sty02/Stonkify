@@ -1,5 +1,4 @@
 import cookie from "cookie";
-import { parseCookies } from "./cookieParser";
 
 export const initUser = (incomingCookie: string | undefined) => {
   if (incomingCookie) {
