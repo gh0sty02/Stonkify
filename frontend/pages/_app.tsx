@@ -10,17 +10,6 @@ import { CookiesProvider } from "react-cookie";
 import { useSelector } from "react-redux";
 import { SessionProvider } from "next-auth/react";
 
-const { default: AbortController } = require("abort-controller");
-const { default: fetch, Headers, Request, Response } = require("node-fetch");
-
-Object.assign(globalThis, {
-  fetch,
-  Headers,
-  Request,
-  Response,
-  AbortController,
-});
-
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   const { cartItems } = useSelector((state: AppState) => state.cart);
   const { user: stateUser } = useSelector((state: AppState) => state.auth);
