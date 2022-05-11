@@ -57,10 +57,8 @@ export const getServerSideProps = wrapper.getServerSideProps(
 
     return {
       redirect: {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
+        destination: "/",
+        permanent: false,
       },
     };
   }
