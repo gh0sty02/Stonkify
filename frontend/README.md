@@ -29,6 +29,7 @@
 - [React.js](https://reactjs.org/)
 - [RTK Query](https://redux.js.org/)
 - [TypeScript](https://www.typescriptlang.org/)
+- [NextAuth](https://next-auth.js.org/)
 - [React Bootstrap](https://react-bootstrap.github.io/)
 - [Font Awesome](https://fontawesome.com)
 - [React Icons](https://react-icons.github.io/react-icons/search)
