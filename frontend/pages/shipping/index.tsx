@@ -1,15 +1,11 @@
 import { IShippingAddress } from "interfaces/orderUtils.interface";
 import Head from "next/head";
-import router from "next/router";
 import { Fragment, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { cartInit, shippingAddressInit } from "reducers/cartSlice";
-import { userInit } from "reducers/userInfoSlice";
+
 import ShippingScreen from "screens/ShippingScreen";
-import { useLoginMutation } from "services/userApi";
-import { AppState } from "store";
-import { initData } from "utils/initDataOld";
 
 const Shipping = () => {
   const dispatch = useDispatch();

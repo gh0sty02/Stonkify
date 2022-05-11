@@ -6,21 +6,6 @@ import PaymentScreen from "screens/PaymentMethodScreen";
 import { wrapper } from "store";
 
 const PaymentMethod = () => {
-  // const { user, cartItems, shippingAddress, paymentMethod } = initData();
-  const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   if (user) {
-  //     dispatch(userInit(user));
-  //   }
-
-  //   if (cartItems) {
-  //     dispatch(cartInit(cartItems));
-  //   }
-  //   if (shippingAddress) {
-  //     dispatch(shippingAddressInit(shippingAddress));
-  //   }
-  // }, [user, cartItems, shippingAddressInit]);
   return (
     <Fragment>
       <Head>

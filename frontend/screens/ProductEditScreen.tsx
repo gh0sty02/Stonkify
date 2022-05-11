@@ -1,23 +1,14 @@
 import Link from "next/link";
-import { FC, FormEvent, useEffect, useRef, useState } from "react";
+import { FC, FormEvent, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
-import { AppState } from "store";
 import FormContainer from "components/FormContainer";
 import Loader from "components/Loader";
-import Message from "components/Message";
-import {
-  getCurrentProduct,
-  updateProduct,
-} from "reducers/asyncActions/productActions";
-import { resetUpdateProductSucces } from "reducers/adminProductSlice";
+
 import { IProduct } from "interfaces/products.interface";
 import { useUpdateProductMutation } from "services/productsApi";
-
-// import { resetproduct } from "reducers/createProductSlice";
 
 interface IProps {
   data: {

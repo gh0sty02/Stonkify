@@ -32,9 +32,6 @@ export const authSlice = createSlice({
       state.token = null;
     },
   },
-  // extraReducers : (builder) => ({
-  //   userApi.endpoints
-  // })
 });
 
 export const { setCredentials, logout, userInit } = authSlice.actions;

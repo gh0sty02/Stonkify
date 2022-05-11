@@ -17,5 +17,4 @@ export function parseCookies(
   }
 
   return parsedCookies;
-  // return {};
 }

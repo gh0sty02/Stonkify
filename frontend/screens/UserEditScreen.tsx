@@ -31,7 +31,6 @@ const UserEditScreen: FC<IProps> = ({ data: { user, token, id } }) => {
       token,
     });
     router.push("/admin/userList");
-    // }
   };
 
   return (

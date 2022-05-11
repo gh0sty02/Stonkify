@@ -59,8 +59,6 @@ export const getStaticProps: GetStaticProps = wrapper.getStaticProps<{
   const id = context.params?.id as string;
 
   if (id) {
-    // const data = (await store.dispatch(getProduct.initiate(id)))
-    //   .data as IProduct;
     const data = await store.dispatch(getProduct.initiate(id));
     await Promise.all(getRunningOperationPromises());
     if ("data" in data) {
@@ -72,10 +70,6 @@ export const getStaticProps: GetStaticProps = wrapper.getStaticProps<{
         },
       };
     }
-
-    // const { data }: { data: IProduct } = await axios.get(
-    //   `${process.env.BACKEND_URL}/api/products/${id}`
-    // );
 
     return {
       props: {

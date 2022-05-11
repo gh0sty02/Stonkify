@@ -12,10 +12,7 @@ import { IProduct } from "interfaces/products.interface";
 import { IShippingAddress } from "interfaces/orderUtils.interface";
 import { useSession } from "next-auth/react";
 
-const ShippingScreen: FC<{
-  // shippingAddress: IShippingAddress | undefined;
-  // cartItems: IProduct[] | undefined;
-}> = () => {
+const ShippingScreen: FC<{}> = () => {
   const session = useSession();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -35,18 +32,6 @@ const ShippingScreen: FC<{
       setCountry(shippingAddress.country);
     }
   }, [shippingAddress]);
-
-  // useEffect(() => {
-  //   if (!cartItems) {
-  //     router.push("/cart");
-  //   }
-  //   if (shippingAddress) {
-  //     setAddress(shippingAddress.address);
-  //     setCity(shippingAddress.city);
-  //     setPostalCode(shippingAddress.postalCode);
-  //     setCountry(shippingAddress.country);
-  //   }
-  // }, []);
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();

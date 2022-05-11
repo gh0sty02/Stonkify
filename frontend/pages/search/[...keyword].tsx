@@ -22,11 +22,6 @@ const Products: FC<{ keyword: string; page: number }> = ({ keyword, page }) => {
   const products = data?.products;
   const pages = data?.pages;
 
-  // useEffect(() => {
-  //   if (keyword) {
-  //     dispatch(getAllProducts({ keyword, pageNumber: page }));
-  //   }
-  // }, [keyword, page]);
   return (
     <Fragment>
       <Head>

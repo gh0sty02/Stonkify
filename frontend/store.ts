@@ -41,7 +41,7 @@ export const makeStore = (
         reviewApi.middleware
       ),
     ...options,
-    // devTools: process.env.NODE_ENV !== "production",
+    devTools: process.env.NODE_ENV !== "production",
   });
 
 export const store = makeStore();

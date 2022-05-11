@@ -28,7 +28,6 @@ const ProductsCarousel: FC<{ topProducts: IProduct[] }> = ({ topProducts }) => {
         ))}
     </Carousel>
   );
-  // );
 };
 
 export default ProductsCarousel;

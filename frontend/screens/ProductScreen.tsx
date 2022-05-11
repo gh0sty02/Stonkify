@@ -19,7 +19,6 @@ import { useRouter } from "next/router";
 
 import Loader from "components/Loader";
 import Message from "components/Message";
-// import { addToCart } from "reducers/asyncActions/cartActions";
 
 import { useGetProductQuery } from "services/productsApi";
 import { IProduct } from "interfaces/products.interface";
@@ -54,14 +53,6 @@ const ProductScreen: FC<{
   const state = useSelector((state: AppState) => state);
   const session = useSession();
   const token = session.data?.accessToken as string;
-
-  // const { error: reviewError, success: reviewSuccess } = state.productReview;
-
-  // useEffect(() => {
-  //   if (reviewSuccess) {
-  //     setReviewStatus(true);
-  //   }
-  // }, [reviewSuccess]);
 
   const addToCartHandler = async () => {
     if (!token) {

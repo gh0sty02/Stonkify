@@ -27,7 +27,6 @@ export const orderSlice = createSlice({
     },
 
     resetOrders: (state) => {
-      // localStorage.removeItem("order");
       state.currentOrder = null;
     },
     setOrder: (state, { payload }: PayloadAction<IOrder>) => {

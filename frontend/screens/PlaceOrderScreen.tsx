@@ -39,7 +39,6 @@ const PlaceOrderScreen = () => {
 
   const [createOrder, { isLoading, isError, error }] = useCreateOrderMutation();
 
-  // const { user, token } = useSelector((state: AppState) => state.auth);
   const session = useSession();
   const token = session.data?.accessToken as string;
 

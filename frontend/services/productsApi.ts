@@ -15,7 +15,6 @@ export const productsApi = createApi({
       return action.payload[reducerPath];
     }
   },
-  //   keepUnusedDataFor: 60,
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.BACKEND_URL}/api/products`,
   }),
